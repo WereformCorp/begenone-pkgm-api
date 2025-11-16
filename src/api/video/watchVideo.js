@@ -2,7 +2,7 @@ import axios from "axios";
 const isProd = process.env.NODE_ENV === "production";
 
 // Configuration for CloudFront and S3
-const cloudFrontDomain = process.env.REACT_APP_CLOUDFRONT_URL;
+const cloudFrontDomain = "https://d123.cloudfront.net";
 const s3BucketDomain = "https://begenone-images.s3.us-east-1.amazonaws.com";
 
 const calculateTimeAgo = timestamp => {
@@ -15,7 +15,11 @@ const calculateTimeAgo = timestamp => {
   return `${days} day(s) ago`;
 };
 
-export const watchVideo = async (videoId, CHANNEL_API_URL, VIDEO_API_URL) => {
+export const watchVideo = async ({
+  videoId,
+  CHANNEL_API_URL,
+  VIDEO_API_URL,
+}) => {
   try {
     // Fetch video and thumbnails data
     const videoRes = await axios.get(

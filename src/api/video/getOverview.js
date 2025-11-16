@@ -1,19 +1,18 @@
 import axios from "axios";
-import calculateTimeAgo from "../utils/calculateTimeAgo";
+import calculateTimeAgo from "../../utils/calculateTimeAgo";
 
-const cloudFrontDomain = process.env.REACT_APP_CLOUDFRONT_URL;
+const cloudFrontDomain = "https://dpz1evfcdl4g3.cloudfront.net";
 const s3BucketDomain = "https://begenone-images.s3.us-east-1.amazonaws.com";
 
-export const getOverview = async (
-  userId = null,
-  VIDEO_API_URL,
-  CHANNEL_API_URL
-) => {
+export const getOverview = async ({ VIDEO_API_URL, CHANNEL_API_URL }) => {
   const [videosRes, channelsRes] = await Promise.all([
     axios.get(`${VIDEO_API_URL}/api/v1/videos/route-video/`),
     axios.get(`${CHANNEL_API_URL}/api/v1/channels/channel-routes/`),
     // axios.get(`${urlPath}/api/v1/route-video/thumbnail`),
   ]);
+
+  // console.log(`Video Response: `, videosRes);
+  // console.log(`Channel Response: `, channelsRes);
 
   const videos = videosRes.data.data;
   const channels = channelsRes.data.data;
@@ -27,7 +26,7 @@ export const getOverview = async (
     ])
   );
 
-  console.log(`Thumbnail Response: `, thumbnailMap);
+  // console.log(`Thumbnail Response: `, thumbnailMap);
 
   const channelLogoMap = new Map(
     channels.map(channel => [

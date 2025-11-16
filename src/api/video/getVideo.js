@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const getVideos = async (ids, VIDEO_API_URL) => {
+export const getVideo = async ({ ids, VIDEO_API_URL }) => {
   try {
     // Join the ids array into a string to pass as a query parameter
     const queryParam = ids.join(",");
@@ -28,5 +28,3 @@ const getVideos = async (ids, VIDEO_API_URL) => {
     throw error; // You can handle this error as needed in the frontend
   }
 };
-
-export default getVideos;

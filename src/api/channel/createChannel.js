@@ -1,12 +1,12 @@
 import axios from "axios";
 
 // Function to fetch channel data for React components
-export const createChannel = async (
+export const createChannel = async ({
   name,
   about,
   channelUserName,
-  CHANNEL_API_URL
-) => {
+  CHANNEL_API_URL,
+}) => {
   try {
     // Fetch data from the backend API endpoint
     const { data: channelData } = await axios.post(

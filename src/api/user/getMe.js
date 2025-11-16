@@ -2,7 +2,7 @@ import axios from "axios";
 
 import { useQuery } from "@tanstack/react-query";
 import { useDispatch } from "react-redux";
-import { setMe } from "../store/userSlice";
+import { setMe } from "../../store/userSlice";
 
 export const getMe = async USER_API_URL => {
   try {
