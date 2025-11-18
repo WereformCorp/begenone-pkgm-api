@@ -2,7 +2,7 @@ import axios from "axios";
 const isProd = process.env.NODE_ENV === "production";
 
 // Configuration for CloudFront and S3
-const cloudFrontDomain = "https://d123.cloudfront.net";
+const cloudFrontDomain = "https://dpz1evfcdl4g3.cloudfront.net";
 const s3BucketDomain = "https://begenone-images.s3.us-east-1.amazonaws.com";
 
 const calculateTimeAgo = timestamp => {
