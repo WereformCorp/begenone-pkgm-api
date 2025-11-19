@@ -4,41 +4,29 @@ import { useQuery } from "@tanstack/react-query";
 import { useDispatch } from "react-redux";
 import { setMe } from "../../store/userSlice";
 
-export const getMe = async USER_API_URL => {
+export const getMe = async (USER_API_URL, token) => {
+  // const token = await getToken("user_session");
+
+  if (!token) {
+    console.log("No stored session token");
+    return null;
+  }
+
   try {
     const response = await axios.get(`${USER_API_URL}/api/v1/users/me/`, {
-      withCredentials: true,
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
     });
 
-    console.log(`Login Response: `, response.data);
+    // console.log("GET ME Success:", response.data);
     return response.data;
   } catch (error) {
-    console.error("Login error:", error);
+    console.log(
+      "GET ME Error:",
+      error?.response?.status,
+      error?.response?.data
+    );
     throw error;
   }
-};
-
-export const useUserData = () => {
-  const dispatch = useDispatch();
-
-  const { data, isLoading, isError } = useQuery({
-    queryKey: ["me"],
-    queryFn: getMe,
-    refetchInterval: 60000,
-    staleTime: 30000,
-    // onSuccess: newData => {
-    //   console.log("onSuccess triggered with newData: ", newData);
-    // },
-    onError: error => {
-      console.error("Fetching user data failed:", error);
-    },
-  });
-
-  if (isLoading) {
-    return <h1>Loading user data...</h1>;
-  }
-
-  dispatch(setMe(data));
-
-  return { data, isLoading, isError };
 };
