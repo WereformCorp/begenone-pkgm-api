@@ -11,8 +11,11 @@
   "license": "ISC",
   "packageManager": "pnpm@10.20.0",
   "peerDependencies": {
+    "@reduxjs/toolkit": "*",
     "@tanstack/react-query": "*",
-    "react-redux": "*",
-    "@reduxjs/toolkit": "*"
+    "react-redux": "*"
+  },
+  "dependencies": {
+    "react-native-mime-types": "^2.5.0"
   }
 }
