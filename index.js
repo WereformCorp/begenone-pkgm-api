@@ -24,6 +24,7 @@ export { getMe } from "./src/api/user/getMe";
 export { createWire } from "./src/api/wire/createWire";
 export { deleteWire } from "./src/api/wire/deleteWire";
 export { getWire } from "./src/api/wire/getWire";
+export { getAllWires } from "./src/api/wire/getAllWires";
 export { updateWire } from "./src/api/wire/updateWire";
 
 // UTILITY FUNCTIONS
