@@ -1,6 +1,6 @@
 import axios from "axios";
 
-export async function verifyEmail(token, AUTH_API_URL) {
+export async function emailVerify(token, AUTH_API_URL, email) {
   try {
     console.log(`Token from Verify Email: `, token);
 
@@ -8,6 +8,7 @@ export async function verifyEmail(token, AUTH_API_URL) {
       `${AUTH_API_URL}/api/v1/authentication/route-verification/verifyEmail`,
       {
         code: token, // 6-digit OTP
+        email,
       }
     );
 

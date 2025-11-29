@@ -25,7 +25,8 @@ export const getMe = async (USER_API_URL, token) => {
     console.log(
       "GET ME Error:",
       error?.response?.status,
-      error?.response?.data
+      error?.response?.data,
+      error?.response
     );
     throw error;
   }
