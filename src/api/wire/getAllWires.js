@@ -3,11 +3,26 @@ import calculateTimeAgo from "../../utils/calculateTimeAgo";
 
 const cloudFrontDomain = "https://dpz1evfcdl4g3.cloudfront.net";
 
-export const getAllWires = async ({ WIRE_API_URL, CHANNEL_API_URL }) => {
-  const [wiresRes, channelsRes] = await Promise.all([
-    axios.get(`${WIRE_API_URL}/api/v1/wires/route-wires/`),
-    axios.get(`${CHANNEL_API_URL}/api/v1/channels/channel-routes/`),
-  ]);
+export const getAllWires = async ({
+  WIRE_API_URL,
+  CHANNEL_API_URL,
+  page = 1,
+  limit = 10,
+}) => {
+  console.info(`Request Reaching Get All Wires in the API Package!`);
+  console.info(`WIRE API URL from API Package: `, WIRE_API_URL);
+  console.info(`CHANNEL API URL from API Package: `, CHANNEL_API_URL);
+
+  // Send pagination query params to backend
+  const wiresRes = await axios.get(`${WIRE_API_URL}/api/v1/wires/route-wires`, {
+    params: { page, limit },
+  });
+
+  console.info(`Wires Response from Get All Wires: `, wiresRes);
+
+  const channelsRes = await axios.get(
+    `${CHANNEL_API_URL}/api/v1/channels/channel-routes/`
+  );
 
   const channels = channelsRes.data.data;
 
@@ -18,17 +33,22 @@ export const getAllWires = async ({ WIRE_API_URL, CHANNEL_API_URL }) => {
     ])
   );
 
-  console.log(`GET ALL WIRES FROM API PACKAGE: `, wires);
+  // Backend returns wires inside wiresRes.data.data
+  const rawWires = wiresRes.data.data;
 
-  const wires = wiresRes.data.data.map(wire => ({
+  const wires = rawWires.map(wire => ({
     ...wire,
     timeAgo: calculateTimeAgo(wire.time),
   }));
 
-  console.log(`WIRES FROM API PACKAGE`, wires);
-
   return {
-    wires,
+    // for frontend list
+    data: wires,
+
+    // from backend meta
+    meta: wiresRes.data.meta,
+
+    // all channel logos
     channelLogos: Object.fromEntries(channelLogoMap),
   };
 };
