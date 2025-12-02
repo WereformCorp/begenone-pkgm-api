@@ -1,7 +1,12 @@
 import axios from "axios";
 
 // Function to fetch channel data for React components
-export const getChannel = async (channelId, CHANNEL_API_URL, VIDEO_API_URL) => {
+export const getChannel = async ({
+  channelId,
+  CHANNEL_API_URL,
+  VIDEO_API_URL,
+  CLOUDFRONT_URL,
+}) => {
   try {
     // Fetch data from the backend API endpoint
     const { data: channelData } = await axios.get(
@@ -37,11 +42,11 @@ export const getChannel = async (channelId, CHANNEL_API_URL, VIDEO_API_URL) => {
 
     // Add CloudFront URL to channelLogo and bannerImage
     if (extractedData.channelLogo) {
-      extractedData.channelLogo = `${cloudFrontDomain}/${extractedData.channelLogo}`;
+      extractedData.channelLogo = `${CLOUDFRONT_URL}/${extractedData.channelLogo}`;
     }
 
     if (extractedData.bannerImage) {
-      extractedData.bannerImage = `${cloudFrontDomain}/${extractedData.bannerImage}`;
+      extractedData.bannerImage = `${CLOUDFRONT_URL}/${extractedData.bannerImage}`;
     }
 
     const { videos } = extractedData;
@@ -55,9 +60,9 @@ export const getChannel = async (channelId, CHANNEL_API_URL, VIDEO_API_URL) => {
         video.thumbnail &&
         video.thumbnail.includes("default-thumbnail.jpeg")
       ) {
-        video.thumbnailUrl = `${cloudFrontDomain}/default-thumbnail.png`;
+        video.thumbnailUrl = `${CLOUDFRONT_URL}/default-thumbnail.png`;
       } else {
-        video.thumbnailUrl = `${cloudFrontDomain}/${video.thumbnail}`;
+        video.thumbnailUrl = `${CLOUDFRONT_URL}/${video.thumbnail}`;
       }
     });
 
@@ -67,7 +72,7 @@ export const getChannel = async (channelId, CHANNEL_API_URL, VIDEO_API_URL) => {
         (LatestVidThumbKey.includes("default-thumbnail.jpeg") ||
           LatestVidThumbKey.includes("default-thumbnail.png"))
           ? `https://begenone-images.s3.us-east-1.amazonaws.com/default-thumbnail.png`
-          : `${cloudFrontDomain}/${latestVideo.thumbnail}` || null;
+          : `${CLOUDFRONT_URL}/${latestVideo.thumbnail}` || null;
     }
 
     return {
