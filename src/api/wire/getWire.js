@@ -1,4 +1,5 @@
 import axios from "axios";
+import calculateTimeAgo from "../../utils/calculateTimeAgo";
 
 // export const getWire = async ({ id, WIRE_API_URL }) => {
 //   try {
@@ -33,12 +34,25 @@ export const getWire = async ({ id, WIRE_API_URL }) => {
 
     console.log("Response from getWire API:", response.data);
 
-    // Note: status is "success" (lowercase)
     if (response.data.status === "success") {
-      return response.data.data;
+      const wires = response.data.data.map(wire => ({
+        ...wire,
+        timeAgo: calculateTimeAgo(wire.time),
+      }));
+
+      console.log(`Time Ago: `, wires);
+
+      return wires;
     } else {
-      throw new Error("Failed to fetch wire.");
+      throw new Error("Failed to fetch videos.");
     }
+
+    // Note: status is "success" (lowercase)
+    // if (response.data.status === "success") {
+    //   return response.data.data;
+    // } else {
+    //   throw new Error("Failed to fetch wire.");
+    // }
   } catch (error) {
     console.error("Error fetching wire:", error);
     throw error;
