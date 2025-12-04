@@ -1,4 +1,5 @@
 import axios from "axios";
+import calculateTimeAgo from "../../utils/calculateTimeAgo";
 
 export const getVideo = async ({ ids, VIDEO_API_URL }) => {
   try {
@@ -18,8 +19,21 @@ export const getVideo = async ({ ids, VIDEO_API_URL }) => {
     console.log("Response from getVideos API:", response.data);
 
     // Check if response is successful and has data
+    // if (response.data.status === "Success") {
+    //   return response.data.data; // Return the videos data
+    // } else {
+    //   throw new Error("Failed to fetch videos.");
+    // }
+
     if (response.data.status === "Success") {
-      return response.data.data; // Return the videos data
+      const videos = response.data.data.map(video => ({
+        ...video,
+        timeAgo: calculateTimeAgo(video.time),
+      }));
+
+      console.log(`Time Ago: `, videos);
+
+      return videos;
     } else {
       throw new Error("Failed to fetch videos.");
     }
