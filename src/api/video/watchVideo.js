@@ -21,22 +21,28 @@ export const watchVideo = async ({
   VIDEO_API_URL,
 }) => {
   try {
+    const GET_VIDEO_ENDPOINT = "/api/v1/videos/route-video/";
+
     // Fetch video and thumbnails data
     const videoRes = await axios.get(
-      `${VIDEO_API_URL}/api/v1/videos/route-video/${videoId}`
+      `${VIDEO_API_URL}${GET_VIDEO_ENDPOINT}${videoId}`
     );
     // console.log(`Video Response: `, videoRes.data.data);
 
+    const GET_CHANNEL_ENDPOINT = "/api/v1/channels/channel-routes/";
+
     const channelId = videoRes.data.data.channel;
     const channelRes = await axios.get(
-      `${CHANNEL_API_URL}/api/v1/channels/channel-routes/${channelId}`
+      `${CHANNEL_API_URL}${GET_CHANNEL_ENDPOINT}${channelId}`
     );
 
     const channelData = channelRes.data.data;
     console.log(`Channel Response: `, channelData);
 
+    const GET_ALL_VIDEOS_ENDPOINT = "/api/v1/videos/route-video/";
+
     const videosRes = await axios.get(
-      `${VIDEO_API_URL}/api/v1/videos/route-video/`
+      `${VIDEO_API_URL}${GET_ALL_VIDEOS_ENDPOINT}`
     );
     const videoData = videoRes.data.data;
 

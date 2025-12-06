@@ -9,8 +9,10 @@ export const getChannel = async ({
 }) => {
   try {
     // Fetch data from the backend API endpoint
+    const GET_CHANNEL_ENDPOINT = "/api/v1/channels/channel-routes/";
+
     const { data: channelData } = await axios.get(
-      `${CHANNEL_API_URL}/api/v1/channels/channel-routes/${channelId}`
+      `${CHANNEL_API_URL}${GET_CHANNEL_ENDPOINT}${channelId}`
     );
 
     // Map and transform the data as needed
@@ -85,7 +87,10 @@ export const getChannel = async ({
       wiresData,
     };
   } catch (error) {
-    console.error("Error fetching channel data:", error);
-    throw error; // Propagate error if needed
+    console.error(
+      "GET CHANNEL error:",
+      error?.response?.data || error?.message || error
+    );
+    throw error;
   }
 };

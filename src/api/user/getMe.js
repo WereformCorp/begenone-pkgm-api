@@ -12,8 +12,10 @@ export const getMe = async (USER_API_URL, token) => {
     return null;
   }
 
+  const GET_ME_ENDPOINT = "/api/v1/users/me/";
+
   try {
-    const response = await axios.get(`${USER_API_URL}/api/v1/users/me/`, {
+    const response = await axios.get(`${USER_API_URL}${GET_ME_ENDPOINT}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -22,11 +24,9 @@ export const getMe = async (USER_API_URL, token) => {
     // console.log("GET ME Success:", response.data);
     return response.data;
   } catch (error) {
-    console.log(
-      "GET ME Error:",
-      error?.response?.status,
-      error?.response?.data,
-      error?.response
+    console.error(
+      "GET ME error:",
+      error?.response?.data || error?.message || error
     );
     throw error;
   }

@@ -6,15 +6,14 @@ export const getVideo = async ({ ids, VIDEO_API_URL }) => {
     // Join the ids array into a string to pass as a query parameter
     const queryParam = ids.join(",");
 
+    const GET_VIDEO_ENDPOINT = "/api/v1/videos/route-video/";
+
     // Make the API call with the query parameter
-    const response = await axios.get(
-      `${VIDEO_API_URL}/api/v1/videos/route-video/`,
-      {
-        params: {
-          ids: queryParam, // Sending the ids as a comma-separated string
-        },
-      }
-    );
+    const response = await axios.get(`${VIDEO_API_URL}${GET_VIDEO_ENDPOINT}`, {
+      params: {
+        ids: queryParam, // Sending the ids as a comma-separated string
+      },
+    });
 
     console.log("Response from getVideos API:", response.data);
 
@@ -38,7 +37,10 @@ export const getVideo = async ({ ids, VIDEO_API_URL }) => {
       throw new Error("Failed to fetch videos.");
     }
   } catch (error) {
-    console.error("Error fetching videos:", error);
-    throw error; // You can handle this error as needed in the frontend
+    console.error(
+      "GET VIDEO Error:",
+      error?.response?.data || error?.message || error
+    );
+    throw error;
   }
 };

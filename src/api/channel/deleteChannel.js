@@ -4,8 +4,11 @@ import axios from "axios";
 export const deleteChannel = async (channelId, CHANNEL_API_URL) => {
   try {
     // Fetch data from the backend API endpoint
+
+    const DELETE_CHANNEL_ENDPOINT = "/api/v1/channels/channel-routes/";
+
     const { data: channelData } = await axios.delete(
-      `${CHANNEL_API_URL}/api/v1/channels/channel-routes/${channelId}`,
+      `${CHANNEL_API_URL}${DELETE_CHANNEL_ENDPOINT}${channelId}`,
       {
         withCredentials: true, // ✅ this includes cookies/session info
       }
@@ -15,7 +18,10 @@ export const deleteChannel = async (channelId, CHANNEL_API_URL) => {
 
     return channelData;
   } catch (error) {
-    console.error("Error fetching channel data:", error);
-    throw error; // Propagate error if needed
+    console.error(
+      "DELETE CHANNEL error:",
+      error?.response?.data || error?.message || error
+    );
+    throw error;
   }
 };

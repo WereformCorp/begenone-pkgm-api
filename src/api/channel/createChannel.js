@@ -9,8 +9,11 @@ export const createChannel = async ({
 }) => {
   try {
     // Fetch data from the backend API endpoint
+
+    const CREATE_CHANNEL_ENDPOINT = "/api/v1/channels/channel-routes/";
+
     const { data: channelData } = await axios.post(
-      `${CHANNEL_API_URL}/api/v1/channels/channel-routes/`,
+      `${CHANNEL_API_URL}${CREATE_CHANNEL_ENDPOINT}`,
       {
         name,
         about,
@@ -25,7 +28,10 @@ export const createChannel = async ({
 
     return channelData;
   } catch (error) {
-    console.error("Error fetching channel data:", error);
-    throw error; // Propagate error if needed
+    console.error(
+      "CREATE CHANNEL error:",
+      error?.response?.data || error?.message || error
+    );
+    throw error;
   }
 };

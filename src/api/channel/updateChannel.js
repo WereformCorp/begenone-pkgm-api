@@ -10,8 +10,11 @@ export const updateChannel = async (
 ) => {
   try {
     // Fetch data from the backend API endpoint
+
+    const UPDATE_CHANNEL_ENDPOINT = "/api/v1/channels/channel-routes/";
+
     const { data: channelData } = await axios.patch(
-      `${CHANNEL_API_URL}/api/v1/channels/channel-routes/${channelId}`,
+      `${CHANNEL_API_URL}${UPDATE_CHANNEL_ENDPOINT}${channelId}`,
       {
         name,
         about,
@@ -26,7 +29,10 @@ export const updateChannel = async (
 
     return channelData;
   } catch (error) {
-    console.error("Error fetching channel data:", error);
-    throw error; // Propagate error if needed
+    console.error(
+      "UPDATE CHANNEL error:",
+      error?.response?.data || error?.message || error
+    );
+    throw error;
   }
 };
