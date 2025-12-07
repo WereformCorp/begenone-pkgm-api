@@ -1,13 +1,13 @@
 import axios from "axios";
 
 // Function to fetch channel data for React components
-export const updateChannel = async (
+export const updateChannel = async ({
   channelId,
   name,
   about,
   channelUserName,
-  CHANNEL_API_URL
-) => {
+  CHANNEL_API_URL,
+}) => {
   try {
     // Fetch data from the backend API endpoint
 
@@ -25,9 +25,10 @@ export const updateChannel = async (
       }
     );
 
-    console.log(`Channel Data: `, channelData);
-
-    return channelData;
+    if (data) {
+      console.log(`Channel Data: `, channelData);
+      return channelData;
+    }
   } catch (error) {
     console.error(
       "UPDATE CHANNEL error:",
