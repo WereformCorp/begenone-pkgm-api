@@ -1,6 +1,56 @@
+// import axios from "axios";
+
+// // Function to fetch channel data for React components
+// export const updateChannel = async ({
+//   channelId,
+//   name,
+//   about,
+//   channelUserName,
+//   CHANNEL_API_URL,
+// }) => {
+//   try {
+//     // Fetch data from the backend API endpoint
+
+//     const UPDATE_CHANNEL_ENDPOINT = "/api/v1/channels/channel-routes/";
+
+//     const { data: channelData } = await axios.patch(
+//       `${CHANNEL_API_URL}${UPDATE_CHANNEL_ENDPOINT}${channelId}`,
+//       {
+//         name,
+//         about,
+//         channelUserName,
+//       },
+//       {
+//         withCredentials: true, // ✅ this includes cookies/session info
+//       }
+//     );
+
+//     if (data) {
+//       console.log(`Channel Data: `, channelData);
+//       return channelData;
+//     }
+//   } catch (error) {
+//     console.error(
+//       "UPDATE CHANNEL error:",
+//       error?.response?.data || error?.message || error
+//     );
+//     throw error;
+//   }
+// };
+
 import axios from "axios";
 
-// Function to fetch channel data for React components
+/**
+ * Updates an existing channel's core information.
+ *
+ * @param {Object} params - Channel update payload
+ * @param {string} params.channelId - Channel unique ID
+ * @param {string} params.name - Updated channel name
+ * @param {string} params.about - Updated channel description
+ * @param {string} params.channelUserName - Updated public username
+ * @param {string} params.CHANNEL_API_URL - Channel service base URL
+ * @returns {Promise<Object>} Updated channel data
+ */
 export const updateChannel = async ({
   channelId,
   name,
@@ -9,29 +59,30 @@ export const updateChannel = async ({
   CHANNEL_API_URL,
 }) => {
   try {
-    // Fetch data from the backend API endpoint
-
     const UPDATE_CHANNEL_ENDPOINT = "/api/v1/channels/channel-routes/";
+
+    const payload = {
+      name,
+      about,
+      channelUserName,
+    };
+
+    const config = {
+      withCredentials: true, // ✅ includes cookies/session info
+    };
 
     const { data: channelData } = await axios.patch(
       `${CHANNEL_API_URL}${UPDATE_CHANNEL_ENDPOINT}${channelId}`,
-      {
-        name,
-        about,
-        channelUserName,
-      },
-      {
-        withCredentials: true, // ✅ this includes cookies/session info
-      }
+      payload,
+      config
     );
 
-    if (data) {
-      console.log(`Channel Data: `, channelData);
-      return channelData;
-    }
+    console.log("Update Channel | Response:", channelData);
+
+    return channelData;
   } catch (error) {
     console.error(
-      "UPDATE CHANNEL error:",
+      "UPDATE CHANNEL Error:",
       error?.response?.data || error?.message || error
     );
     throw error;
