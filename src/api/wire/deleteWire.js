@@ -1,58 +1,36 @@
-// import axios from "axios";
-
-// export async function deleteWire({ WIRE_API_URL, id, token }) {
-//   console.log(`Token from Actual Request making Delete Wire: `, token);
-//   const response = await axios.delete(
-//     `${WIRE_API_URL}/api/v1/wires/route-wires/${id}`,
-//     {
-//       headers: {
-//         Authorization: `Bearer ${token}`,
-//       },
-//     }
-//   );
-
-//   console.log(`Response from Delete Wire API: `, response.data);
-
-//   return response.data || true;
-// }
-
 import axios from "axios";
 
 /**
- * Create a new wire post.
+ * Delete a wire by its ID.
  *
- * Sends an authenticated POST request to the Wire API.
+ * This function sends an authenticated DELETE request to the Wire service
+ * to remove a wire permanently.
  *
- * @async
  * @param {Object} params
- * @param {string} params.WIRE_API_URL - Base URL of the Wire API
- * @param {string} params.wireText - Main text content of the wire
- * @param {string} params.heading - Optional heading/title for the wire
- * @param {string} params.token - Bearer token for authentication
+ * @param {string} params.WIRE_API_URL - Base URL of the Wire API service
+ * @param {string} params.id - Unique ID of the wire to be deleted
+ * @param {string} params.token - Bearer token used for authentication
  *
- * @returns {Promise<Object>} Created wire data returned by the API
+ * @returns {Promise<Object|boolean>}
+ * Returns the API response data if available, otherwise `true`
  */
-export async function createWire({ WIRE_API_URL, wireText, heading, token }) {
-  try {
-    const url = `${WIRE_API_URL}/api/v1/wires/route-wires/`;
+export async function deleteWire({ WIRE_API_URL, id, token }) {
+  // Token is required for authenticated wire deletion
+  console.log(`Token from Actual Request making Delete Wire: `, token);
 
-    console.log("Create Wire API URL:", url);
-    console.log("Auth token provided:", Boolean(token));
+  // Construct and send DELETE request to backend
+  const response = await axios.delete(
+    `${WIRE_API_URL}/api/v1/wires/route-wires/${id}`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
 
-    const response = await axios.post(
-      url,
-      { wireText, heading },
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
+  // Log backend response for debugging and validation
+  console.log(`Response from Delete Wire API: `, response.data);
 
-    console.log("Create Wire API response:", response.data);
-    return response.data;
-  } catch (error) {
-    console.error("Error creating wire:", error);
-    throw error;
-  }
+  // Return backend response or fallback to true if no body is returned
+  return response.data || true;
 }

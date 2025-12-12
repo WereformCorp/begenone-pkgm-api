@@ -81,13 +81,15 @@ export const getWire = async ({ id, WIRE_API_URL }) => {
     console.log("Get Wire API response:", response.data);
 
     if (response.data.status === "success") {
-      const wires = response.data.data.map(wire => ({
+      const wire = response.data.data;
+
+      const enrichedWire = {
         ...wire,
         timeAgo: calculateTimeAgo(wire.time),
-      }));
+      };
 
-      console.log("GetWire | Enriched wires:", wires);
-      return wires;
+      console.log("GetWire | Enriched wire:", enrichedWire);
+      return enrichedWire;
     }
 
     throw new Error("Failed to fetch wire.");
