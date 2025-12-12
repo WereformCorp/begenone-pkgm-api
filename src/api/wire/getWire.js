@@ -25,14 +25,60 @@ import calculateTimeAgo from "../../utils/calculateTimeAgo";
 //   }
 // };
 
+// export const getWire = async ({ id, WIRE_API_URL }) => {
+//   try {
+//     const url = `${WIRE_API_URL}/api/v1/wires/route-wires/${id}`;
+//     console.log("GET WIRE URL ===>", url);
+
+//     const response = await axios.get(url);
+
+//     console.log("Response from getWire API:", response.data);
+
+//     if (response.data.status === "success") {
+//       const wires = response.data.data.map(wire => ({
+//         ...wire,
+//         timeAgo: calculateTimeAgo(wire.time),
+//       }));
+
+//       console.log(`Time Ago: `, wires);
+
+//       return wires;
+//     } else {
+//       throw new Error("Failed to fetch videos.");
+//     }
+
+//     // Note: status is "success" (lowercase)
+//     // if (response.data.status === "success") {
+//     //   return response.data.data;
+//     // } else {
+//     //   throw new Error("Failed to fetch wire.");
+//     // }
+//   } catch (error) {
+//     console.error("Error fetching wire:", error);
+//     throw error;
+//   }
+// };
+
+/**
+ * Fetch a single wire by ID.
+ *
+ * Adds relative time (`timeAgo`) to the wire data.
+ *
+ * @async
+ * @param {Object} params
+ * @param {string} params.id - Wire ID
+ * @param {string} params.WIRE_API_URL - Base URL of the Wire API
+ *
+ * @returns {Promise<Object[]>} Wire data with enriched time metadata
+ */
 export const getWire = async ({ id, WIRE_API_URL }) => {
   try {
     const url = `${WIRE_API_URL}/api/v1/wires/route-wires/${id}`;
-    console.log("GET WIRE URL ===>", url);
+    console.log("Get Wire API URL:", url);
 
     const response = await axios.get(url);
 
-    console.log("Response from getWire API:", response.data);
+    console.log("Get Wire API response:", response.data);
 
     if (response.data.status === "success") {
       const wires = response.data.data.map(wire => ({
@@ -40,19 +86,11 @@ export const getWire = async ({ id, WIRE_API_URL }) => {
         timeAgo: calculateTimeAgo(wire.time),
       }));
 
-      console.log(`Time Ago: `, wires);
-
+      console.log("GetWire | Enriched wires:", wires);
       return wires;
-    } else {
-      throw new Error("Failed to fetch videos.");
     }
 
-    // Note: status is "success" (lowercase)
-    // if (response.data.status === "success") {
-    //   return response.data.data;
-    // } else {
-    //   throw new Error("Failed to fetch wire.");
-    // }
+    throw new Error("Failed to fetch wire.");
   } catch (error) {
     console.error("Error fetching wire:", error);
     throw error;

@@ -19,6 +19,7 @@ export { watchVideo } from "./api/video/watchVideo";
 
 //  USER RELATED APIs
 export { getMe } from "./api/user/getMe";
+export { updateUser } from "./api/user/updateUser";
 
 //  WIRE RELATED APIs
 export { createWire } from "./api/wire/createWire";
