@@ -48,9 +48,14 @@ import axios from "axios";
  *
  * @throws Will throw if the API request fails
  */
-export async function updateUser({ USER_API_ENDPOINT, id, dataObj }) {
+export async function updateUser({
+  USER_API_ENDPOINT,
+  id,
+  dataObj,
+  UPDATE_USER_ENDPOINT,
+}) {
   try {
-    const UPDATE_USER_ENDPOINT = "/api/v1/users/user/";
+    // const UPDATE_USER_ENDPOINT = "/api/v1/users/user/";
     const url = `${USER_API_ENDPOINT}${UPDATE_USER_ENDPOINT}${id}`;
 
     // Log the final endpoint for debugging

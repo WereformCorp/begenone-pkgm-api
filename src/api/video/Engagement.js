@@ -3,13 +3,14 @@ import axios from "axios";
 export const updateVideoInteraction = async (
   videoId,
   action,
-  VIDEO_API_URL
+  VIDEO_API_URL,
+  UPDATE_VIDEO_INTERACTION_ENDPOINT
 ) => {
   console.log(`Video ID: ${videoId}, Action: ${action}`);
 
   try {
-    const UPDATE_VIDEO_INTERACTION_ENDPOINT =
-      "/api/v1/videos/route-engagement/interaction/";
+    // const UPDATE_VIDEO_INTERACTION_ENDPOINT =
+    //   "/api/v1/videos/route-engagement/interaction/";
 
     const response = await axios.patch(
       `${VIDEO_API_URL}${UPDATE_VIDEO_INTERACTION_ENDPOINT}${videoId}/${action}`,

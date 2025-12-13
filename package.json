@@ -1,15 +1,28 @@
 {
-  "name": "@begenone/pkgm-api",
-  "version": "1.0.0",
-  "description": "",
-  "main": "src/index.js",
+  "name": "@wereform/pkgm-api",
+  "version": "1.0.6",
+  "description": "Shared API utilities for BEGENONE and React / React Native apps",
+  "main": "dist/index.js",
+  "files": [
+    "dist",
+    "README.md"
+  ],
   "scripts": {
-    "build": "babel src --out-dir dist --extensions .js,.jsx"
+    "build": "babel src --out-dir dist --extensions .js,.jsx",
+    "prepublishOnly": "pnpm run build"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "packageManager": "pnpm@10.20.0",
+  "publishConfig": {
+    "access": "public"
+  },
+  "keywords": [
+    "api",
+    "react",
+    "react-native",
+    "redux",
+    "begenone"
+  ],
+  "author": "Areesh Alam",
+  "license": "MIT",
   "peerDependencies": {
     "@reduxjs/toolkit": "*",
     "@tanstack/react-query": "*",

@@ -14,13 +14,20 @@ import axios from "axios";
  * @returns {Promise<Object|boolean>}
  * Returns the API response data if available, otherwise `true`
  */
-export async function deleteWire({ WIRE_API_URL, id, token }) {
+export async function deleteWire({
+  WIRE_API_URL,
+  id,
+  token,
+  DELETE_WIRE_ENDPOINT,
+}) {
   // Token is required for authenticated wire deletion
   console.log(`Token from Actual Request making Delete Wire: `, token);
 
+  // const DELETE_WIRE_ENDPOINT = "api/v1/wires/route-wires/";
+
   // Construct and send DELETE request to backend
   const response = await axios.delete(
-    `${WIRE_API_URL}/api/v1/wires/route-wires/${id}`,
+    `${WIRE_API_URL}/${DELETE_WIRE_ENDPOINT}${id}`,
     {
       headers: {
         Authorization: `Bearer ${token}`,

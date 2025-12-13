@@ -79,15 +79,21 @@ export const getAllWires = async ({
   CHANNEL_API_URL,
   page = 1,
   limit = 10,
+  GET_ALL_WIRES_ENDPOINT_URL,
 }) => {
   console.info("GetAllWires | Request started");
   console.info("WIRE_API_URL:", WIRE_API_URL);
   console.info("CHANNEL_API_URL:", CHANNEL_API_URL);
 
+  // const GET_ALL_WIRES_ENDPOINT_URL = 'api/v1/wires/route-wires';
+
   // Fetch paginated wires
-  const wiresRes = await axios.get(`${WIRE_API_URL}/api/v1/wires/route-wires`, {
-    params: { page, limit },
-  });
+  const wiresRes = await axios.get(
+    `${WIRE_API_URL}/${GET_ALL_WIRES_ENDPOINT_URL}`,
+    {
+      params: { page, limit },
+    }
+  );
 
   console.info("GetAllWires | Wires response:", wiresRes);
 
