@@ -28,6 +28,11 @@ export async function uploadVideoMultipart({
     const mime = filetype === "video" ? "video/mp4" : "image/jpeg";
     // const AWS_INIT_ENDPOINT = "/api/v1/aws/s3/multipart/init";
 
+    console.log(
+      ` AWS_API_URL in uploadVideoMultipart: `,
+      `${AWS_API_URL}${AWS_INIT_ENDPOINT}`
+    );
+
     // 1️⃣ INIT MULTIPART
     const { data: initData } = await axios.post(
       `${AWS_API_URL}${AWS_INIT_ENDPOINT}`,

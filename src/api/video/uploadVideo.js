@@ -25,9 +25,15 @@ export async function uploadVideo({
   AWS_API_URL,
   channelId,
   UPLOAD_VIDEO_ENDPOINT,
+  AWS_INIT_ENDPOINT,
+  MULTIPART_PART_URL,
+  MULTIPART_COMPLETE_URL,
 }) {
-  const MULTIPART_PART_URL = "api/v1/aws/s3/multipart/part-url";
-  const MULTIPART_COMPLETE_URL = "api/v1/aws/s3/multipart/complete";
+  // const AWS_INIT_ENDPOINT = "/api/v1/aws/s3/multipart/init";
+  // const MULTIPART_PART_URL = "api/v1/aws/s3/multipart/part-url";
+  // const MULTIPART_COMPLETE_URL = "api/v1/aws/s3/multipart/complete";
+
+  console.log(`AWS API URL in uploadVideo function: `, AWS_API_URL);
 
   try {
     // 1️⃣ Upload video to S3 (multipart)
@@ -37,6 +43,7 @@ export async function uploadVideo({
       AWS_API_URL,
       token,
       filetype: "video",
+      AWS_INIT_ENDPOINT,
       MULTIPART_PART_URL,
       MULTIPART_COMPLETE_URL,
     });
@@ -52,12 +59,19 @@ export async function uploadVideo({
         AWS_API_URL,
         token,
         filetype: "thumbnail",
+        AWS_INIT_ENDPOINT,
+        MULTIPART_PART_URL,
+        MULTIPART_COMPLETE_URL,
       });
 
       console.log("Thumbnail Key from Upload:", thumbnailKey);
     }
 
     // const UPLOAD_VIDEO_ENDPOINT = "/api/v1/videos/route-video/";
+    console.log(
+      `VIDEO_API_URL ENDPOINT in uploadVideo function: `,
+      `${VIDEO_API_URL}${UPLOAD_VIDEO_ENDPOINT}`
+    );
 
     // 3️⃣ Create DB record
     const { data } = await axios.post(
