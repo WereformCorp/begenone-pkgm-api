@@ -29,4 +29,4 @@ export { getAllWires } from "./api/wire/getAllWires";
 export { updateWire } from "./api/wire/updateWire";
 
 // UTILITY FUNCTIONS
-// export { default as calculateTimeAgo } from "./src/utils/calculateTimeAgo";
+export { default as calculateTimeAgo } from "./utils/calculateTimeAgo";
