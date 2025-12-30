@@ -1,15 +1,3 @@
-// const calculateTimeAgo = timestamp => {
-//   const timeDiff = Date.now() - new Date(timestamp).getTime();
-//   const minutes = Math.floor(timeDiff / 60000);
-//   if (minutes < 60) return `${minutes} minute(s) ago`;
-//   const hours = Math.floor(minutes / 60);
-//   if (hours < 24) return `${hours} hour(s) ago`;
-//   const days = Math.floor(hours / 24);
-//   return `${days} day(s) ago`;
-// };
-
-// export default calculateTimeAgo;
-
 const calculateTimeAgo = timestamp => {
   const diff = Date.now() - new Date(timestamp).getTime();
 
