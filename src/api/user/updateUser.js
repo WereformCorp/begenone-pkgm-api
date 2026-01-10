@@ -1,32 +1,3 @@
-// import axios from "axios";
-
-// export async function updateUser({ USER_API_ENDPOINT, id, dataObj }) {
-//   try {
-//     const UPDATE_USER_ENDPOINT = `/api/v1/users/user/`;
-
-//     console.log(
-//       `ENDPOINT: `,
-//       `${USER_API_ENDPOINT}${UPDATE_USER_ENDPOINT}${id}`
-//     );
-
-//     const response = await axios.patch(
-//       `${USER_API_ENDPOINT}${UPDATE_USER_ENDPOINT}${id}`,
-
-//       dataObj
-//     );
-
-//     if (response) {
-//       console.log(`Data from Update User ——— Package API:`, response.data);
-//       const userData = response.data;
-
-//       return userData;
-//     }
-//   } catch (err) {
-//     console.log(`Error from Update User: `, err);
-//     throw err;
-//   }
-// }
-
 import axios from "axios";
 
 /**
@@ -41,6 +12,11 @@ import axios from "axios";
  *
  * @param {Object} params
  * @param {string} params.USER_API_ENDPOINT - Base URL of the User API
+ *
+ * @example
+ * URL Must start and end with a forward slash.
+ * Example: "https://api.example.com/"
+ *
  * @param {string} params.id - User ID to update
  * @param {Object} params.dataObj - Fields to update on the user
  *
@@ -55,7 +31,6 @@ export async function updateUser({
   UPDATE_USER_ENDPOINT,
 }) {
   try {
-    // const UPDATE_USER_ENDPOINT = "/api/v1/users/user/";
     const url = `${USER_API_ENDPOINT}${UPDATE_USER_ENDPOINT}${id}`;
 
     // Log the final endpoint for debugging
