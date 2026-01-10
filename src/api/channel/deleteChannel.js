@@ -5,6 +5,11 @@ import axios from "axios";
  *
  * @param {string} channelId - Channel unique ID
  * @param {string} CHANNEL_API_URL - Channel service base URL
+ *
+ * @example
+ * URL Must start and end with a forward slash.
+ * Example: "https://api.example.com/"
+ *
  * @returns {Promise<Object>} Delete response data
  */
 export const deleteChannel = async ({
@@ -13,8 +18,6 @@ export const deleteChannel = async ({
   DELETE_CHANNEL_ENDPOINT,
 }) => {
   try {
-    // const DELETE_CHANNEL_ENDPOINT = "/api/v1/channels/channel-routes/";
-
     const config = {
       withCredentials: true, // ✅ includes cookies/session info
     };

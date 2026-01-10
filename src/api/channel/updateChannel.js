@@ -8,7 +8,12 @@ import axios from "axios";
  * @param {string} params.name - Updated channel name
  * @param {string} params.about - Updated channel description
  * @param {string} params.channelUserName - Updated public username
- * @param {string} params.CHANNEL_API_URL - Channel service base URL
+ * @param {string} params.CHANNEL_API_URL - Channel service base URL.
+ *
+ * @example
+ * URL Must start and end with a forward slash.
+ * Example: "https://api.example.com/"
+ *
  * @returns {Promise<Object>} Updated channel data
  */
 export const updateChannel = async ({
@@ -20,8 +25,6 @@ export const updateChannel = async ({
   UPDATE_CHANNEL_ENDPOINT,
 }) => {
   try {
-    // const UPDATE_CHANNEL_ENDPOINT = "/api/v1/channels/channel-routes/";
-
     const payload = {
       name,
       about,

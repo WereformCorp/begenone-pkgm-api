@@ -8,6 +8,11 @@ import axios from "axios";
  * @param {string} params.channelId - Channel unique ID
  * @param {string} params.CHANNEL_API_URL - Channel service base URL
  * @param {string} params.VIDEO_API_URL - Video service base URL
+ *
+ * @example
+ * URL Must start and end with a forward slash.
+ * Example: "https://api.example.com/"
+ *
  * @param {string} params.CLOUDFRONT_URL - CloudFront base URL
  * @returns {Promise<Object>} Channel data with videos and metadata
  */
@@ -15,12 +20,12 @@ export const getChannel = async ({
   channelId,
   CHANNEL_API_URL,
   VIDEO_API_URL,
+  VIDEO_API_ENDPOINT,
   CLOUDFRONT_URL,
   GET_CHANNEL_ENDPOINT,
+  DEFAULT_THUMBNAIL_URL,
 }) => {
   try {
-    // const GET_CHANNEL_ENDPOINT = "/api/v1/channels/channel-routes/";
-
     const { data: channelData } = await axios.get(
       `${CHANNEL_API_URL}${GET_CHANNEL_ENDPOINT}${channelId}`
     );
@@ -36,7 +41,7 @@ export const getChannel = async ({
     const queryParam = videoIds.join(",");
 
     const { data: videoData } = await axios.get(
-      `${VIDEO_API_URL}/api/v1/videos/route-video/`,
+      `${VIDEO_API_URL}${VIDEO_API_ENDPOINT}`,
       {
         params: {
           ids: queryParam,
@@ -79,7 +84,7 @@ export const getChannel = async ({
         LatestVidThumbKey &&
         (LatestVidThumbKey.includes("default-thumbnail.jpeg") ||
           LatestVidThumbKey.includes("default-thumbnail.png"))
-          ? `https://begenone-images.s3.us-east-1.amazonaws.com/default-thumbnail.png`
+          ? DEFAULT_THUMBNAIL_URL
           : `${CLOUDFRONT_URL}/${latestVideo.thumbnail}` || null;
     }
 

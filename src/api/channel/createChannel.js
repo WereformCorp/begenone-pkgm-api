@@ -8,6 +8,11 @@ import axios from "axios";
  * @param {string} params.about - Channel description
  * @param {string} params.channelUserName - Public channel username
  * @param {string} params.CHANNEL_API_URL - Channel service base URL
+ *
+ * @example
+ * URL Must start and end with a forward slash.
+ * Example: "https://api.example.com/"
+ *
  * @returns {Promise<Object>} Created channel data
  */
 export const createChannel = async ({
@@ -18,8 +23,6 @@ export const createChannel = async ({
   CREATE_CHANNEL_ENDPOINT,
 }) => {
   try {
-    // const CREATE_CHANNEL_ENDPOINT = "/api/v1/channels/channel-routes/";
-
     const payload = {
       name: NAME,
       about: ABOUT,
