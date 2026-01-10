@@ -12,6 +12,10 @@ import { uploadVideoMultipart } from "./uploadVideoMultipart";
  * @param {string} params.token - Auth token
  * @param {string} params.VIDEO_API_URL - Video service base URL
  * @param {string} params.AWS_API_URL - AWS service base URL
+ * @example
+ * URL Must start and end with a forward slash.
+ * Example: "https://api.example.com/"
+ *
  * @param {string} params.channelId - Channel ID
  * @returns {Promise<Object>} Uploaded video data
  */
@@ -29,10 +33,6 @@ export async function uploadVideo({
   MULTIPART_PART_URL,
   MULTIPART_COMPLETE_URL,
 }) {
-  // const AWS_INIT_ENDPOINT = "/api/v1/aws/s3/multipart/init";
-  // const MULTIPART_PART_URL = "api/v1/aws/s3/multipart/part-url";
-  // const MULTIPART_COMPLETE_URL = "api/v1/aws/s3/multipart/complete";
-
   console.log(`AWS API URL in uploadVideo function: `, AWS_API_URL);
 
   try {
@@ -67,7 +67,6 @@ export async function uploadVideo({
       console.log("Thumbnail Key from Upload:", thumbnailKey);
     }
 
-    // const UPLOAD_VIDEO_ENDPOINT = "/api/v1/videos/route-video/";
     console.log(
       `VIDEO_API_URL ENDPOINT in uploadVideo function: `,
       `${VIDEO_API_URL}${UPLOAD_VIDEO_ENDPOINT}`

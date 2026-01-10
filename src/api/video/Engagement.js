@@ -29,6 +29,9 @@ import axios from "axios";
  * Throws if the network request fails or the server responds with an error.
  *
  * @example
+ * URL Must start and end with a forward slash.
+ * Example: "https://api.example.com/"
+ *
  * const stats = await updateVideoInteraction(
  *   "videoId123",
  *   "like",

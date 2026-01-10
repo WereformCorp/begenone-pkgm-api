@@ -1,8 +1,5 @@
 import axios from "axios";
 
-// const cloudFrontDomain = "https://dpz1evfcdl4g3.cloudfront.net";
-// const s3BucketDomain = "https://begenone-images.s3.us-east-1.amazonaws.com";
-
 const calculateTimeAgo = timestamp => {
   const timeDiff = Date.now() - new Date(timestamp).getTime();
   const minutes = Math.floor(timeDiff / 60000);
@@ -20,6 +17,10 @@ const calculateTimeAgo = timestamp => {
  * @param {string} params.videoId - Video ID to watch
  * @param {string} params.CHANNEL_API_URL - Channel service base URL
  * @param {string} params.VIDEO_API_URL - Video service base URL
+ * @example
+ * URL Must start and end with a forward slash.
+ * Example: "https://api.example.com/"
+ *
  * @returns {Promise<Object>} Video watch data bundle
  */
 export const watchVideo = async ({
@@ -33,10 +34,6 @@ export const watchVideo = async ({
   CLOUDFRONTDOMAIN,
 }) => {
   try {
-    // const GET_VIDEO_ENDPOINT = "/api/v1/videos/route-video/";
-    // const GET_CHANNEL_ENDPOINT = "/api/v1/channels/channel-routes/";
-    // const GET_ALL_VIDEOS_ENDPOINT = "/api/v1/videos/route-video/";
-
     const videoRes = await axios.get(
       `${VIDEO_API_URL}${GET_VIDEO_ENDPOINT}${videoId}`
     );

@@ -7,6 +7,10 @@ import axios from "axios";
  * @param {File} params.file - File to upload
  * @param {string} params.channelId - Channel ID
  * @param {string} params.AWS_API_URL - AWS service base URL
+ * @example
+ * URL Must start and end with a forward slash.
+ * Example: "https://api.example.com/"
+ *
  * @param {string} params.token - Auth token
  * @param {"video"|"thumbnail"} params.filetype - File type
  * @returns {Promise<string>} Uploaded file key
@@ -26,7 +30,6 @@ export async function uploadVideoMultipart({
     const totalParts = Math.ceil(file.size / CHUNK_SIZE);
 
     const mime = filetype === "video" ? "video/mp4" : "image/jpeg";
-    // const AWS_INIT_ENDPOINT = "/api/v1/aws/s3/multipart/init";
 
     console.log(
       ` AWS_API_URL in uploadVideoMultipart: `,
@@ -58,8 +61,6 @@ export async function uploadVideoMultipart({
       const end = Math.min(start + CHUNK_SIZE, file.size);
       const chunk = file.slice(start, end);
 
-      // const MULTIPART_PART_URL = "api/v1/aws/s3/multipart/part-url";
-
       const { data: presigned } = await axios.get(
         `${AWS_API_URL}/${MULTIPART_PART_URL}`,
         {
@@ -88,7 +89,6 @@ export async function uploadVideoMultipart({
       parts.push({ partNumber, ETag: etag });
     }
 
-    // MULTIPART_COMPLETE_URL = "api/v1/aws/s3/multipart/complete"
     // 3️⃣ COMPLETE MULTIPART
     await axios.post(
       `${AWS_API_URL}/${MULTIPART_COMPLETE_URL}`,

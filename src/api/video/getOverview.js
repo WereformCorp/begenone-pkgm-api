@@ -1,9 +1,6 @@
 import axios from "axios";
 import calculateTimeAgo from "../../utils/calculateTimeAgo";
 
-const cloudFrontDomain = "https://dpz1evfcdl4g3.cloudfront.net";
-const s3BucketDomain = "https://begenone-images.s3.us-east-1.amazonaws.com";
-
 /**
  * Fetches an overview of videos and channels for the home feed.
  * Enriches videos with thumbnails, channel logos, and time-ago metadata.
@@ -11,6 +8,10 @@ const s3BucketDomain = "https://begenone-images.s3.us-east-1.amazonaws.com";
  * @param {Object} params
  * @param {string} params.VIDEO_API_URL - Video service base URL
  * @param {string} params.CHANNEL_API_URL - Channel service base URL
+ * @example
+ * URL Must start and end with a forward slash.
+ * Example: "https://api.example.com/"
+ *
  * @returns {Promise<Object>} Overview feed data
  */
 export const getOverview = async ({
@@ -18,11 +19,10 @@ export const getOverview = async ({
   CHANNEL_API_URL,
   GET_ALL_VIDEOS_ENDPOINT,
   GET_ALL_CHANNELS_ENDPOINT,
+  CLOUDFRONTDOMAIN,
+  S3BUCKETDOMAIN,
 }) => {
   try {
-    // const GET_ALL_VIDEOS_ENDPOINT = "/api/v1/videos/route-video/";
-    // const GET_ALL_CHANNELS_ENDPOINT = "/api/v1/channels/channel-routes/";
-
     const [videosRes, channelsRes] = await Promise.all([
       axios.get(`${VIDEO_API_URL}${GET_ALL_VIDEOS_ENDPOINT}`),
       axios.get(`${CHANNEL_API_URL}${GET_ALL_CHANNELS_ENDPOINT}`),
@@ -35,7 +35,7 @@ export const getOverview = async ({
     const thumbnailMap = new Map(
       videos.map(item => [
         item.thumbnail,
-        `${cloudFrontDomain}/${item.thumbnail}`,
+        `${CLOUDFRONTDOMAIN}/${item.thumbnail}`,
       ])
     );
 
@@ -43,7 +43,7 @@ export const getOverview = async ({
       channels.map(channel => [
         channel._id,
         channel.channelLogo
-          ? `${cloudFrontDomain}/${channel.channelLogo}`
+          ? `${CLOUDFRONTDOMAIN}/${channel.channelLogo}`
           : null,
       ])
     );
@@ -58,7 +58,7 @@ export const getOverview = async ({
         ["default-thumbnail.jpeg", "default-thumbnail.png"].includes(
           video.thumbnail
         )
-          ? `${s3BucketDomain}/default-thumbnail.png`
+          ? `${S3BUCKETDOMAIN}/default-thumbnail.png`
           : thumbnailMap.get(video.thumbnail) || null;
 
       const channelId = video.channel._id || video.channel;
