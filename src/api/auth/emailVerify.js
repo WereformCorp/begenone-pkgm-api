@@ -5,6 +5,11 @@ import axios from "axios";
  *
  * @param {string} token - 6-digit verification code
  * @param {string} AUTH_API_URL - Auth service base URL
+ *
+ * @example
+ * URL Must start and end with a forward slash.
+ * Example: "https://api.example.com/"
+ *
  * @param {string} email - User email address
  * @returns {Promise<Object>} Verification API response
  */
@@ -16,9 +21,6 @@ export async function emailVerify({
 }) {
   try {
     console.log("Verify Email Token:", token);
-
-    // const VERIFY_EMAIL_ENDPOINT =
-    //   "/api/v1/authentication/route-verification/verifyEmail";
 
     const payload = {
       code: token, // 6-digit OTP

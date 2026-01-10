@@ -6,6 +6,11 @@ import axios from "axios";
  * @param {string} email - User email address
  * @param {string} password - User password
  * @param {string} AUTH_API_URL - Auth service base URL
+ *
+ * @example
+ * URL Must start and end with a forward slash.
+ * Example: "https://api.example.com/"
+ *
  * @returns {Promise<Object>} Login API response
  */
 export const login = async ({
@@ -15,8 +20,6 @@ export const login = async ({
   LOGIN_ENDPOINT,
 }) => {
   try {
-    // const LOGIN_ENDPOINT = "/api/v1/authentication/route-login/login";
-
     const payload = {
       eAddress: { email, password },
     };

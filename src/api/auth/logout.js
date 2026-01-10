@@ -4,12 +4,15 @@ import axios from "axios";
  * Logs a user out of the application.
  *
  * @param {string} AUTH_API_URL - Auth service base URL
+ *
+ * @example
+ * URL Must start and end with a forward slash.
+ * Example: "https://api.example.com/"
+ *
  * @returns {Promise<Object>} Logout API response
  */
 export const logout = async ({ AUTH_API_URL, LOGOUT_ENDPOINT }) => {
   try {
-    // const LOGOUT_ENDPOINT = "/api/v1/authentication/route-logout/logout";
-
     const config = {
       withCredentials: true,
     };

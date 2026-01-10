@@ -11,6 +11,11 @@ import axios from "axios";
  * @param {string} params.passwordConfirm - Password confirmation
  * @param {string} params.username - Public username
  * @param {string} params.USER_API_URL - User service base URL
+ *
+ * @example
+ * URL Must start and end with a forward slash.
+ * Example: "https://api.example.com/"
+ *
  * @returns {Promise<Object>} Signup API response
  */
 export const signup = async ({
@@ -35,8 +40,6 @@ export const signup = async ({
     if (password !== passwordConfirm) {
       throw new Error("Passwords do not match");
     }
-
-    // const USER_CHECK_EXISTENCE_ENDPOINT = "/api/v1/users/check-existence";
 
     // Step 1: Check if username or email already exists
     const existenceCheckRes = await axios.post(
