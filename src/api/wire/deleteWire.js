@@ -8,6 +8,10 @@ import axios from "axios";
  *
  * @param {Object} params
  * @param {string} params.WIRE_API_URL - Base URL of the Wire API service
+ * @example
+ * URL Must start and end with a forward slash.
+ * Example: "https://api.example.com/"
+ *
  * @param {string} params.id - Unique ID of the wire to be deleted
  * @param {string} params.token - Bearer token used for authentication
  *
@@ -22,8 +26,6 @@ export async function deleteWire({
 }) {
   // Token is required for authenticated wire deletion
   console.log(`Token from Actual Request making Delete Wire: `, token);
-
-  // const DELETE_WIRE_ENDPOINT = "api/v1/wires/route-wires/";
 
   // Construct and send DELETE request to backend
   const response = await axios.delete(

@@ -14,6 +14,10 @@ const cloudFrontDomain = "https://dpz1evfcdl4g3.cloudfront.net";
  * @param {Object} params
  * @param {string} params.WIRE_API_URL - Base URL of the Wire API
  * @param {string} params.CHANNEL_API_URL - Base URL of the Channel API
+ * @example
+ * URL Must start and end with a forward slash.
+ * Example: "https://api.example.com/"
+ *
  * @param {number} [params.page=1] - Page number
  * @param {number} [params.limit=10] - Items per page
  *
@@ -25,12 +29,11 @@ export const getAllWires = async ({
   page = 1,
   limit = 10,
   GET_ALL_WIRES_ENDPOINT_URL,
+  CHANNEL_API_ENDPOINT,
 }) => {
   console.info("GetAllWires | Request started");
   console.info("WIRE_API_URL:", WIRE_API_URL);
   console.info("CHANNEL_API_URL:", CHANNEL_API_URL);
-
-  // const GET_ALL_WIRES_ENDPOINT_URL = 'api/v1/wires/route-wires';
 
   // Fetch paginated wires
   const wiresRes = await axios.get(
@@ -40,11 +43,13 @@ export const getAllWires = async ({
     }
   );
 
+  // /api/v1/channels/channel-routes/
+
   console.info("GetAllWires | Wires response:", wiresRes);
 
   // Fetch channels for logo mapping
   const channelsRes = await axios.get(
-    `${CHANNEL_API_URL}/api/v1/channels/channel-routes/`
+    `${CHANNEL_API_URL}${CHANNEL_API_ENDPOINT}`
   );
 
   const channels = channelsRes.data.data;

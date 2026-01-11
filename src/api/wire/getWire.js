@@ -10,12 +10,14 @@ import calculateTimeAgo from "../../utils/calculateTimeAgo";
  * @param {Object} params
  * @param {string} params.id - Wire ID
  * @param {string} params.WIRE_API_URL - Base URL of the Wire API
+ * @example
+ * URL Must start and end with a forward slash.
+ * Example: "https://api.example.com/"
  *
  * @returns {Promise<Object[]>} Wire data with enriched time metadata
  */
 export const getWire = async ({ id, WIRE_API_URL, GETWIRE_ENDPOINT_URL }) => {
   try {
-    // const GETWIRE_ENDPOINT_URL = "api/v1/wires/route-wires/";
 
     const url = `${WIRE_API_URL}/${GETWIRE_ENDPOINT_URL}${id}`;
     console.log("Get Wire API URL:", url);
