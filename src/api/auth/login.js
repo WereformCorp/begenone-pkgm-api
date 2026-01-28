@@ -13,34 +13,39 @@ import axios from "axios";
  *
  * @returns {Promise<Object>} Login API response
  */
+
+import Bottleneck from "bottleneck";
+
+const limiter = new Bottleneck({
+  minTime: 200, // at most 1 request every 200ms (5/sec)
+  maxConcurrent: 1, // only one login request at a time
+});
+
 export const login = async ({
   email,
   password,
   AUTH_API_URL,
   LOGIN_ENDPOINT,
 }) => {
-  try {
-    const payload = {
-      eAddress: { email, password },
-    };
+  return limiter.schedule(async () => {
+    try {
+      const payload = {
+        eAddress: { email, password },
+      };
 
-    const config = {
-      withCredentials: true,
-    };
+      const config = {
+        withCredentials: true,
+      };
 
-    const response = await axios.post(
-      `${AUTH_API_URL}${LOGIN_ENDPOINT}`,
-      payload,
-      config
-    );
+      const response = await axios.post(
+        `${AUTH_API_URL}${LOGIN_ENDPOINT}`,
+        payload,
+        config,
+      );
 
-    console.log("Login Response:", response.data);
-    return response.data;
-  } catch (error) {
-    console.error(
-      "Login Error:",
-      error?.response?.data || error?.message || error
-    );
-    throw error;
-  }
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  });
 };

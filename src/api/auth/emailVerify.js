@@ -29,7 +29,7 @@ export async function emailVerify({
 
     const response = await axios.patch(
       `${AUTH_API_URL}${VERIFY_EMAIL_ENDPOINT}`,
-      payload
+      payload,
     );
 
     console.log("EMAIL VERIFY | API RESPONSE ✅✅✅", response.data);
@@ -38,7 +38,7 @@ export async function emailVerify({
   } catch (error) {
     console.error(
       "Email Verify Error:",
-      error?.response?.data || error?.message || error
+      error?.response?.data || error?.message || error,
     );
     throw error;
   }
