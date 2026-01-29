@@ -1,4 +1,5 @@
 import axios from "axios";
+import Bottleneck from "bottleneck";
 
 /**
  * Logs a user in using email and password.
@@ -6,27 +7,31 @@ import axios from "axios";
  * @param {string} email - User email address
  * @param {string} password - User password
  * @param {string} AUTH_API_URL - Auth service base URL
+ * @param {string} LOGIN_ENDPOINT - Login endpoint
+ * @param {Object} limiterOptions - Optional Bottleneck configuration
  *
  * @example
- * URL Must start and end with a forward slash.
- * Example: "https://api.example.com/"
+ * limiterOptions: {
+ *   minTime: 200,
+ *   maxConcurrent: 1
+ * }
  *
  * @returns {Promise<Object>} Login API response
  */
-
-import Bottleneck from "bottleneck";
-
-const limiter = new Bottleneck({
-  minTime: 200, // at most 1 request every 200ms (5/sec)
-  maxConcurrent: 1, // only one login request at a time
-});
 
 export const login = async ({
   email,
   password,
   AUTH_API_URL,
   LOGIN_ENDPOINT,
+  limiterOptions = {},
 }) => {
+  const limiter = new Bottleneck({
+    minTime: 200,
+    maxConcurrent: 1,
+    ...limiterOptions,
+  });
+
   return limiter.schedule(async () => {
     try {
       const payload = {
