@@ -1,20 +1,8 @@
 import axios from "axios";
+import Bottleneck from "bottleneck";
 
 /**
- * Fetches a channel with all associated videos and wires,
- * and resolves CloudFront image URLs.
- *
- * @param {Object} params - Channel fetch parameters
- * @param {string} params.channelId - Channel unique ID
- * @param {string} params.CHANNEL_API_URL - Channel service base URL
- * @param {string} params.VIDEO_API_URL - Video service base URL
- *
- * @example
- * URL Must start and end with a forward slash.
- * Example: "https://api.example.com/"
- *
- * @param {string} params.CLOUDFRONT_URL - CloudFront base URL
- * @returns {Promise<Object>} Channel data with videos and metadata
+ * Fetches a channel with all associated videos and wires.
  */
 export const getChannel = async ({
   channelId,
@@ -24,84 +12,75 @@ export const getChannel = async ({
   CLOUDFRONT_URL,
   GET_CHANNEL_ENDPOINT,
   DEFAULT_THUMBNAIL_URL,
+  limiterOptions = {},
 }) => {
-  try {
-    const { data: channelData } = await axios.get(
-      `${CHANNEL_API_URL}${GET_CHANNEL_ENDPOINT}${channelId}`
-    );
+  const limiter = new Bottleneck({
+    minTime: 200,
+    maxConcurrent: 1,
+    ...limiterOptions,
+  });
 
-    const extractedData = channelData.data;
+  return limiter.schedule(async () => {
+    try {
+      const { data: channelData } = await axios.get(
+        `${CHANNEL_API_URL}${GET_CHANNEL_ENDPOINT}${channelId}`,
+      );
 
-    console.log("Get Channel | Extracted Data:", extractedData);
+      const extractedData = channelData.data;
+      const { videos: videoIds } = extractedData;
 
-    const { videos: videoIds } = extractedData;
+      const queryParam = videoIds.join(",");
 
-    console.log("Channel Video IDs:", videoIds);
+      const { data: videoData } = await axios.get(
+        `${VIDEO_API_URL}${VIDEO_API_ENDPOINT}`,
+        { params: { ids: queryParam } },
+      );
 
-    const queryParam = videoIds.join(",");
+      const allVideos = videoData.data;
 
-    const { data: videoData } = await axios.get(
-      `${VIDEO_API_URL}${VIDEO_API_ENDPOINT}`,
-      {
-        params: {
-          ids: queryParam,
-        },
+      if (extractedData.channelLogo) {
+        extractedData.channelLogo = `${CLOUDFRONT_URL}/${extractedData.channelLogo}`;
       }
-    );
 
-    console.log("Video Data:", videoData);
-
-    const allVideos = videoData.data;
-
-    // Add CloudFront URL to channelLogo and bannerImage
-    if (extractedData.channelLogo) {
-      extractedData.channelLogo = `${CLOUDFRONT_URL}/${extractedData.channelLogo}`;
-    }
-
-    if (extractedData.bannerImage) {
-      extractedData.bannerImage = `${CLOUDFRONT_URL}/${extractedData.bannerImage}`;
-    }
-
-    const { videos } = extractedData;
-    const latestVideo = allVideos.length > 0 ? allVideos[0] : null;
-
-    const wiresData = extractedData.wires;
-    const LatestVidThumbKey = latestVideo?.thumbnail || null;
-
-    allVideos.forEach(video => {
-      if (
-        video.thumbnail &&
-        video.thumbnail.includes("default-thumbnail.jpeg")
-      ) {
-        video.thumbnailUrl = `${CLOUDFRONT_URL}/default-thumbnail.png`;
-      } else {
-        video.thumbnailUrl = `${CLOUDFRONT_URL}/${video.thumbnail}`;
+      if (extractedData.bannerImage) {
+        extractedData.bannerImage = `${CLOUDFRONT_URL}/${extractedData.bannerImage}`;
       }
-    });
 
-    if (latestVideo) {
-      latestVideo.thumbnailUrl =
-        LatestVidThumbKey &&
-        (LatestVidThumbKey.includes("default-thumbnail.jpeg") ||
-          LatestVidThumbKey.includes("default-thumbnail.png"))
-          ? DEFAULT_THUMBNAIL_URL
-          : `${CLOUDFRONT_URL}/${latestVideo.thumbnail}` || null;
+      const latestVideo = allVideos.length > 0 ? allVideos[0] : null;
+      const wiresData = extractedData.wires;
+
+      allVideos.forEach(video => {
+        video.thumbnailUrl =
+          video.thumbnail && video.thumbnail.includes("default-thumbnail.jpeg")
+            ? `${CLOUDFRONT_URL}/default-thumbnail.png`
+            : `${CLOUDFRONT_URL}/${video.thumbnail}`;
+      });
+
+      if (latestVideo) {
+        const key = latestVideo.thumbnail;
+        latestVideo.thumbnailUrl =
+          key &&
+          (key.includes("default-thumbnail.jpeg") ||
+            key.includes("default-thumbnail.png"))
+            ? DEFAULT_THUMBNAIL_URL
+            : `${CLOUDFRONT_URL}/${key}`;
+      }
+
+      return {
+        channel: extractedData,
+        latestVideo,
+        channelLogo: extractedData.channelLogo,
+        bannerImage: extractedData.bannerImage,
+        videos: extractedData.videos,
+        LatestVideoThumbnail: latestVideo ? latestVideo.thumbnailUrl : null,
+        wiresData,
+      };
+    } catch (error) {
+      console.error(
+        "GET CHANNEL Error:",
+        error?.response?.data || error?.message || error,
+      );
+      throw error;
     }
-
-    return {
-      channel: extractedData,
-      latestVideo,
-      channelLogo: extractedData.channelLogo,
-      bannerImage: extractedData.bannerImage,
-      videos,
-      LatestVideoThumbnail: latestVideo ? latestVideo.thumbnailUrl : null,
-      wiresData,
-    };
-  } catch (error) {
-    console.error(
-      "GET CHANNEL Error:",
-      error?.response?.data || error?.message || error
-    );
-    throw error;
-  }
+  });
 };

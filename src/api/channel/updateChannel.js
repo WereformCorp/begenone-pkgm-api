@@ -1,20 +1,8 @@
 import axios from "axios";
+import Bottleneck from "bottleneck";
 
 /**
  * Updates an existing channel's core information.
- *
- * @param {Object} params - Channel update payload
- * @param {string} params.channelId - Channel unique ID
- * @param {string} params.name - Updated channel name
- * @param {string} params.about - Updated channel description
- * @param {string} params.channelUserName - Updated public username
- * @param {string} params.CHANNEL_API_URL - Channel service base URL.
- *
- * @example
- * URL Must start and end with a forward slash.
- * Example: "https://api.example.com/"
- *
- * @returns {Promise<Object>} Updated channel data
  */
 export const updateChannel = async ({
   channelId,
@@ -23,32 +11,40 @@ export const updateChannel = async ({
   channelUserName,
   CHANNEL_API_URL,
   UPDATE_CHANNEL_ENDPOINT,
+  limiterOptions = {},
 }) => {
-  try {
-    const payload = {
-      name,
-      about,
-      channelUserName,
-    };
+  const limiter = new Bottleneck({
+    minTime: 200,
+    maxConcurrent: 1,
+    ...limiterOptions,
+  });
 
-    const config = {
-      withCredentials: true, // ✅ includes cookies/session info
-    };
+  return limiter.schedule(async () => {
+    try {
+      const payload = {
+        name,
+        about,
+        channelUserName,
+      };
 
-    const { data: channelData } = await axios.patch(
-      `${CHANNEL_API_URL}${UPDATE_CHANNEL_ENDPOINT}${channelId}`,
-      payload,
-      config
-    );
+      const config = {
+        withCredentials: true,
+      };
 
-    console.log("Update Channel | Response:", channelData);
+      const { data: channelData } = await axios.patch(
+        `${CHANNEL_API_URL}${UPDATE_CHANNEL_ENDPOINT}${channelId}`,
+        payload,
+        config,
+      );
 
-    return channelData;
-  } catch (error) {
-    console.error(
-      "UPDATE CHANNEL Error:",
-      error?.response?.data || error?.message || error
-    );
-    throw error;
-  }
+      console.log("Update Channel | Response:", channelData);
+      return channelData;
+    } catch (error) {
+      console.error(
+        "UPDATE CHANNEL Error:",
+        error?.response?.data || error?.message || error,
+      );
+      throw error;
+    }
+  });
 };

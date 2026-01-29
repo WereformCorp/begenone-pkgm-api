@@ -1,19 +1,8 @@
 import axios from "axios";
+import Bottleneck from "bottleneck";
 
 /**
  * Creates a new channel for the authenticated user.
- *
- * @param {Object} params - Channel creation payload
- * @param {string} params.name - Channel display name
- * @param {string} params.about - Channel description
- * @param {string} params.channelUserName - Public channel username
- * @param {string} params.CHANNEL_API_URL - Channel service base URL
- *
- * @example
- * URL Must start and end with a forward slash.
- * Example: "https://api.example.com/"
- *
- * @returns {Promise<Object>} Created channel data
  */
 export const createChannel = async ({
   NAME,
@@ -21,32 +10,40 @@ export const createChannel = async ({
   CHANNEL_USERNAME,
   CHANNEL_API_URL,
   CREATE_CHANNEL_ENDPOINT,
+  limiterOptions = {},
 }) => {
-  try {
-    const payload = {
-      name: NAME,
-      about: ABOUT,
-      channelUserName: CHANNEL_USERNAME,
-    };
+  const limiter = new Bottleneck({
+    minTime: 200,
+    maxConcurrent: 1,
+    ...limiterOptions,
+  });
 
-    const config = {
-      withCredentials: true, // ✅ includes cookies/session info
-    };
+  return limiter.schedule(async () => {
+    try {
+      const payload = {
+        name: NAME,
+        about: ABOUT,
+        channelUserName: CHANNEL_USERNAME,
+      };
 
-    const { data: channelData } = await axios.post(
-      `${CHANNEL_API_URL}${CREATE_CHANNEL_ENDPOINT}`,
-      payload,
-      config
-    );
+      const config = {
+        withCredentials: true,
+      };
 
-    console.log("Create Channel | Response:", channelData);
+      const { data: channelData } = await axios.post(
+        `${CHANNEL_API_URL}${CREATE_CHANNEL_ENDPOINT}`,
+        payload,
+        config,
+      );
 
-    return channelData;
-  } catch (error) {
-    console.error(
-      "CREATE CHANNEL Error:",
-      error?.response?.data || error?.message || error
-    );
-    throw error;
-  }
+      console.log("Create Channel | Response:", channelData);
+      return channelData;
+    } catch (error) {
+      console.error(
+        "CREATE CHANNEL Error:",
+        error?.response?.data || error?.message || error,
+      );
+      throw error;
+    }
+  });
 };
