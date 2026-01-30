@@ -1,4 +1,5 @@
 import axios from "axios";
+import Bottleneck from "bottleneck";
 
 /**
  * Fetches the authenticated user's profile using a JWT token.
@@ -12,27 +13,39 @@ import axios from "axios";
  * @param {string|null} token - Bearer authentication token
  * @returns {Promise<Object|null>} User data or null if no token is provided
  */
-export const getMe = async ({ USER_API_URL, token, GET_ME_ENDPOINT }) => {
-  // Guard: No token means no authenticated session
+
+export const getMe = async ({
+  USER_API_URL,
+  token,
+  GET_ME_ENDPOINT,
+  limiterOptions = {},
+}) => {
   if (!token) {
     console.log("getMe: No stored session token");
     return null;
   }
 
-  try {
-    const response = await axios.get(`${USER_API_URL}${GET_ME_ENDPOINT}`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+  const limiter = new Bottleneck({
+    minTime: 200,
+    maxConcurrent: 1,
+    ...limiterOptions,
+  });
 
-    // Successful user fetch
-    return response.data;
-  } catch (error) {
-    console.error(
-      "GET ME Error:",
-      error?.response?.data || error?.message || error
-    );
-    throw error;
-  }
+  return limiter.schedule(async () => {
+    try {
+      const response = await axios.get(`${USER_API_URL}${GET_ME_ENDPOINT}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      return response.data;
+    } catch (error) {
+      console.error(
+        "GET ME Error:",
+        error?.response?.data || error?.message || error,
+      );
+      throw error;
+    }
+  });
 };

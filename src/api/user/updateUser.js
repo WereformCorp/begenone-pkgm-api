@@ -1,4 +1,5 @@
 import axios from "axios";
+import Bottleneck from "bottleneck";
 
 /**
  * Update an existing user's data.
@@ -24,27 +25,35 @@ import axios from "axios";
  *
  * @throws Will throw if the API request fails
  */
+/**
+ * Update an existing user's data.
+ */
 export async function updateUser({
   USER_API_ENDPOINT,
   id,
   dataObj,
   UPDATE_USER_ENDPOINT,
+  limiterOptions = {},
 }) {
-  try {
-    const url = `${USER_API_ENDPOINT}${UPDATE_USER_ENDPOINT}${id}`;
+  const limiter = new Bottleneck({
+    minTime: 200,
+    maxConcurrent: 1,
+    ...limiterOptions,
+  });
 
-    // Log the final endpoint for debugging
-    console.log("Update User API URL:", url);
+  return limiter.schedule(async () => {
+    try {
+      const url = `${USER_API_ENDPOINT}${UPDATE_USER_ENDPOINT}${id}`;
 
-    // Send update payload to backend
-    const response = await axios.patch(url, dataObj);
+      console.log("Update User API URL:", url);
 
-    // Backend returns updated user data
-    console.log("Update User API response:", response.data);
+      const response = await axios.patch(url, dataObj);
 
-    return response.data;
-  } catch (err) {
-    console.log("Error from updateUser API:", err);
-    throw err;
-  }
+      console.log("Update User API response:", response.data);
+      return response.data;
+    } catch (err) {
+      console.log("Error from updateUser API:", err);
+      throw err;
+    }
+  });
 }
