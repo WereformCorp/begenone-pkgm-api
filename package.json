@@ -2,8 +2,8 @@
   "name": "@wereform/pkgm-api",
   "version": "1.0.9",
   "description": "Shared API utilities for BEGENONE and React / React Native apps",
-  "source": "dist/index.js",
-  "main": "dist/index.js",
+  "source": "src/index.js",
+  "main": "src/index.js",
   "react-native": "src/index.js",
   "files": [
     "dist",

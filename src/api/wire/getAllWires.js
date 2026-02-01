@@ -31,48 +31,55 @@ export const getAllWires = async ({
   GET_ALL_WIRES_ENDPOINT_URL,
   CHANNEL_API_ENDPOINT,
 }) => {
-  console.info("GetAllWires | Request started");
-  console.info("WIRE_API_URL:", WIRE_API_URL);
-  console.info("CHANNEL_API_URL:", CHANNEL_API_URL);
+  try {
+    console.info("GetAllWires | Request started");
+    console.info("WIRE_API_URL:", WIRE_API_URL);
+    console.info("CHANNEL_API_URL:", CHANNEL_API_URL);
 
-  // Fetch paginated wires
-  const wiresRes = await axios.get(
-    `${WIRE_API_URL}/${GET_ALL_WIRES_ENDPOINT_URL}`,
-    {
-      params: { page, limit },
-    }
-  );
+    // Fetch paginated wires
+    const wiresRes = await axios.get(
+      `${WIRE_API_URL}/${GET_ALL_WIRES_ENDPOINT_URL}`,
+      {
+        params: { page, limit },
+      },
+    );
 
-  // /api/v1/channels/channel-routes/
+    //
 
-  console.info("GetAllWires | Wires response:", wiresRes);
+    console.info("GetAllWires | Wires response:", wiresRes);
 
-  // Fetch channels for logo mapping
-  const channelsRes = await axios.get(
-    `${CHANNEL_API_URL}${CHANNEL_API_ENDPOINT}`
-  );
+    // Fetch channels for logo mapping
+    const channelsRes = await axios.get(
+      `${CHANNEL_API_URL}${CHANNEL_API_ENDPOINT}`,
+    );
 
-  const channels = channelsRes.data.data;
+    const channels = channelsRes.data.data;
 
-  const channelLogoMap = new Map(
-    channels.map(channel => [
-      channel._id,
-      channel.channelLogo ? `${cloudFrontDomain}/${channel.channelLogo}` : null,
-    ])
-  );
+    const channelLogoMap = new Map(
+      channels.map(channel => [
+        channel._id,
+        channel.channelLogo
+          ? `${cloudFrontDomain}/${channel.channelLogo}`
+          : null,
+      ]),
+    );
 
-  // Backend returns wires under wiresRes.data.data
-  const rawWires = wiresRes.data.data;
+    // Backend returns wires under wiresRes.data.data
+    const rawWires = wiresRes.data.data;
 
-  // Enrich wires with relative time
-  const wires = rawWires.map(wire => ({
-    ...wire,
-    timeAgo: calculateTimeAgo(wire.time),
-  }));
+    // Enrich wires with relative time
+    const wires = rawWires.map(wire => ({
+      ...wire,
+      timeAgo: calculateTimeAgo(wire.time),
+    }));
 
-  return {
-    data: wires,
-    meta: wiresRes.data.meta,
-    channelLogos: Object.fromEntries(channelLogoMap),
-  };
+    return {
+      data: wires,
+      meta: wiresRes.data.meta,
+      channelLogos: Object.fromEntries(channelLogoMap),
+    };
+  } catch (error) {
+    console.error("Error in getAllWires:", error);
+    throw error;
+  }
 };

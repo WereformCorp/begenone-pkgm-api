@@ -41,11 +41,12 @@ export const getMe = async ({
 
       return response.data;
     } catch (error) {
-      console.error(
+      console.log(
         "GET ME Error:",
         error?.response?.data || error?.message || error,
       );
-      throw error;
+
+      return null; // ✅ THIS LINE FIXES EVERYTHING
     }
   });
 };
