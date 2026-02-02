@@ -69,7 +69,7 @@ export async function uploadVideo({
 
     console.log(
       `VIDEO_API_URL ENDPOINT in uploadVideo function: `,
-      `${VIDEO_API_URL}${UPLOAD_VIDEO_ENDPOINT}`
+      `${VIDEO_API_URL}${UPLOAD_VIDEO_ENDPOINT}`,
     );
 
     // 3️⃣ Create DB record
@@ -86,7 +86,7 @@ export async function uploadVideo({
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-      }
+      },
     );
 
     if (data) {

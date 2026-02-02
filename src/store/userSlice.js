@@ -9,7 +9,7 @@ const userSlice = createSlice({
     setMe: (state, action) => {
       state.me = action.payload;
 
-      console.log("State Me: ", state.me);
+      // console.log("State Me: ", state.me);
     },
   },
 });

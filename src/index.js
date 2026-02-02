@@ -16,6 +16,7 @@ export { getVideo } from "./api/video/getVideo";
 export { Engagement } from "./api/video/Engagement";
 export { uploadVideo } from "./api/video/uploadVideo";
 export { watchVideo } from "./api/video/watchVideo";
+export { deleteVideo } from "./api/video/deleteVideo";
 
 //  USER RELATED APIs
 export { getMe } from "./api/user/getMe";
