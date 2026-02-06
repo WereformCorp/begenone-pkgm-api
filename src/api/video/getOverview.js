@@ -21,6 +21,7 @@ export const getOverview = async ({
   GET_ALL_CHANNELS_ENDPOINT,
   CLOUDFRONTDOMAIN,
   S3BUCKETDOMAIN,
+  FEATURED_VIDEO_ID = "673f74ba66154c6994b9460f", // DUMMY ID
 }) => {
   try {
     const [videosRes, channelsRes] = await Promise.all([
@@ -36,7 +37,7 @@ export const getOverview = async ({
       videos.map(item => [
         item.thumbnail,
         `${CLOUDFRONTDOMAIN}/${item.thumbnail}`,
-      ])
+      ]),
     );
 
     const channelLogoMap = new Map(
@@ -45,7 +46,7 @@ export const getOverview = async ({
         channel.channelLogo
           ? `${CLOUDFRONTDOMAIN}/${channel.channelLogo}`
           : null,
-      ])
+      ]),
     );
 
     const filteredVideos = videos.filter(video => video.channel);
@@ -56,7 +57,7 @@ export const getOverview = async ({
       video.thumbUrl =
         !video.thumbnail ||
         ["default-thumbnail.jpeg", "default-thumbnail.png"].includes(
-          video.thumbnail
+          video.thumbnail,
         )
           ? `${S3BUCKETDOMAIN}/default-thumbnail.png`
           : thumbnailMap.get(video.thumbnail) || null;
@@ -77,9 +78,8 @@ export const getOverview = async ({
     const limitedVideos = shuffled.slice(0, 21);
 
     // Featured video logic
-    const featuredVideoId = "673f74ba66154c6994b9460f";
-    const featuredVideo = limitedVideos.find(v => v._id === featuredVideoId);
-    const restVideos = limitedVideos.filter(v => v._id !== featuredVideoId);
+    const featuredVideo = limitedVideos.find(v => v._id === FEATURED_VIDEO_ID);
+    const restVideos = limitedVideos.filter(v => v._id !== FEATURED_VIDEO_ID);
     const sortedVideos = featuredVideo
       ? [featuredVideo, ...restVideos]
       : restVideos;
@@ -93,7 +93,7 @@ export const getOverview = async ({
   } catch (error) {
     console.error(
       "Get Overview Error:",
-      error?.response?.data || error?.message || error
+      error?.response?.data || error?.message || error,
     );
     throw error;
   }

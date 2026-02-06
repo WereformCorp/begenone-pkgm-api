@@ -99,10 +99,17 @@ export const watchVideo = async ({
       ? "sect-mid-vdoP-subsBtn-done"
       : "sect-mid-vdoP-subsBtn";
 
-    const videoKey = videoData?.video;
-    const cloudFrontVideoUrl = videoKey
-      ? `${CLOUDFRONTDOMAIN}/${encodeURIComponent(videoKey)}`
-      : null;
+    const toAbsoluteUrl = (domain, value) => {
+      if (!value) return null;
+      const str = String(value).trim();
+      if (/^https?:\/\//i.test(str)) return str;
+      return `${domain}/${encodeURIComponent(str)}`;
+    };
+
+    // ...
+    const cloudFrontVideoUrl = toAbsoluteUrl(CLOUDFRONTDOMAIN, videoData.video);
+
+    console.log("Constructed CloudFront Video URL:", cloudFrontVideoUrl);
 
     return {
       videoData,
