@@ -35,18 +35,18 @@ export const watchVideo = async ({
 }) => {
   try {
     const videoRes = await axios.get(
-      `${VIDEO_API_URL}${GET_VIDEO_ENDPOINT}${videoId}`
+      `${VIDEO_API_URL}${GET_VIDEO_ENDPOINT}${videoId}`,
     );
 
     const channelId = videoRes.data.data.channel;
     const channelRes = await axios.get(
-      `${CHANNEL_API_URL}${GET_CHANNEL_ENDPOINT}${channelId}`
+      `${CHANNEL_API_URL}${GET_CHANNEL_ENDPOINT}${channelId}`,
     );
 
     const channelData = channelRes.data.data;
 
     const videosRes = await axios.get(
-      `${VIDEO_API_URL}${GET_ALL_VIDEOS_ENDPOINT}`
+      `${VIDEO_API_URL}${GET_ALL_VIDEOS_ENDPOINT}`,
     );
 
     const videoData = videoRes.data.data;
@@ -58,7 +58,7 @@ export const watchVideo = async ({
       videosData.map(item => [
         item.thumbnail,
         `${CLOUDFRONTDOMAIN}/${item.thumbnail}`,
-      ])
+      ]),
     );
 
     const filteredVideos = videosData.filter(videoD => videoD.channel);
@@ -99,9 +99,14 @@ export const watchVideo = async ({
       ? "sect-mid-vdoP-subsBtn-done"
       : "sect-mid-vdoP-subsBtn";
 
+    const videoKey = videoData?.video;
+    const cloudFrontVideoUrl = videoKey
+      ? `${CLOUDFRONTDOMAIN}/${encodeURIComponent(videoKey)}`
+      : null;
+
     return {
       videoData,
-      cloudFrontVideoUrl: `${CLOUDFRONTDOMAIN}/${videoData.video}`,
+      cloudFrontVideoUrl,
       limitedVideos,
       isUserSubscribed,
       btnText,
