@@ -39,22 +39,34 @@ import axios from "axios";
  *   "/api/v1/videos/route-engagement/interaction/"
  * );
  */
-export const updateVideoInteraction = async (
+export const updateVideoInteraction = async ({
   videoId,
   action,
   VIDEO_API_URL,
-  UPDATE_VIDEO_INTERACTION_ENDPOINT
-) => {
-  const response = await axios.patch(
-    `${VIDEO_API_URL}${UPDATE_VIDEO_INTERACTION_ENDPOINT}${videoId}/${action}`,
-    {},
-    {
-      withCredentials: true,
-    }
-  );
+  UPDATE_VIDEO_INTERACTION_ENDPOINT,
+}) => {
+  try {
+    const response = await axios.patch(
+      `${VIDEO_API_URL}${UPDATE_VIDEO_INTERACTION_ENDPOINT}${videoId}/${action}`,
+      {},
+      {
+        withCredentials: true,
+      },
+    );
 
-  return {
-    likes: response.data.likes,
-    dislikes: response.data.dislikes,
-  };
+    if (
+      response.data.status &&
+      response.data.status.toLowerCase() === "success"
+    ) {
+      return {
+        likes: response.data.likes,
+        dislikes: response.data.dislikes,
+      };
+    } else {
+      throw new Error("Failed to update video interaction");
+    }
+  } catch (error) {
+    console.log("Error in updateVideoInteraction", error);
+    throw error;
+  }
 };

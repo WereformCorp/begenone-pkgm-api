@@ -13,10 +13,11 @@ export { updateChannel } from "./api/channel/updateChannel";
 //  VIDEO RELATED APIs
 export { getOverview } from "./api/video/getOverview";
 export { getVideo } from "./api/video/getVideo";
-export { Engagement } from "./api/video/Engagement";
+export { updateVideoInteraction } from "./api/video/Engagement";
 export { uploadVideo } from "./api/video/uploadVideo";
 export { watchVideo } from "./api/video/watchVideo";
 export { deleteVideo } from "./api/video/deleteVideo";
+export { updateLikesDislikes } from "./api/video/updateLikesDislikes";
 
 //  USER RELATED APIs
 export { getMe } from "./api/user/getMe";
