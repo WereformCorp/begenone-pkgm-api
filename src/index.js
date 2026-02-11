@@ -17,7 +17,7 @@ export { updateVideoInteraction } from "./api/video/Engagement";
 export { uploadVideo } from "./api/video/uploadVideo";
 export { watchVideo } from "./api/video/watchVideo";
 export { deleteVideo } from "./api/video/deleteVideo";
-export { updateLikesDislikes } from "./api/video/updateLikesDislikes";
+export { updateVideo } from "./api/video/updateVideo";
 
 //  USER RELATED APIs
 export { getMe } from "./api/user/getMe";
