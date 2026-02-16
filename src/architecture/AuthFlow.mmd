@@ -1,0 +1,20 @@
+%% V1.0.13
+%% Auth Flow
+
+sequenceDiagram
+    autonumber
+    participant App as App/Consumer
+    participant login as login
+    participant Limiter as Bottleneck
+    participant AuthAPI as Auth API
+
+    App->>login: login(email, password, AUTH_API_URL, LOGIN_ENDPOINT)
+
+    login->>Limiter: schedule(request)
+    Limiter->>login: (when allowed, minTime: 200ms, maxConcurrent: 1)
+
+    login->>AuthAPI: POST login { eAddress: { email, password } }
+    Note right of login: withCredentials: true
+    AuthAPI-->>login: { user, token, ... }
+
+    login-->>App: response.data
