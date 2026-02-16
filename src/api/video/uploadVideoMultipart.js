@@ -26,6 +26,7 @@ export async function uploadVideoMultipart({
   MULTIPART_COMPLETE_URL,
 }) {
   try {
+    // Chunk size for each part (10MB — AWS S3 multipart minimum is 5MB except last part)
     const CHUNK_SIZE = 10 * 1024 * 1024; // 10MB
     const totalParts = Math.ceil(file.size / CHUNK_SIZE);
 
@@ -33,10 +34,10 @@ export async function uploadVideoMultipart({
 
     console.log(
       ` AWS_API_URL in uploadVideoMultipart: `,
-      `${AWS_API_URL}${AWS_INIT_ENDPOINT}`
+      `${AWS_API_URL}${AWS_INIT_ENDPOINT}`,
     );
 
-    // 1️⃣ INIT MULTIPART
+    // 1. Initiate multipart upload — backend returns uploadId and S3 object key
     const { data: initData } = await axios.post(
       `${AWS_API_URL}${AWS_INIT_ENDPOINT}`,
       {
@@ -49,18 +50,19 @@ export async function uploadVideoMultipart({
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-      }
+      },
     );
 
     const { uploadId, key } = initData;
     const parts = [];
 
-    // 2️⃣ UPLOAD EACH PART
+    // 2. Upload each chunk: get presigned URL → PUT to S3 → collect ETag for completion
     for (let partNumber = 1; partNumber <= totalParts; partNumber++) {
       const start = (partNumber - 1) * CHUNK_SIZE;
       const end = Math.min(start + CHUNK_SIZE, file.size);
       const chunk = file.slice(start, end);
 
+      // Fetch presigned S3 PUT URL for this part
       const { data: presigned } = await axios.get(
         `${AWS_API_URL}/${MULTIPART_PART_URL}`,
         {
@@ -68,11 +70,12 @@ export async function uploadVideoMultipart({
           headers: {
             Authorization: `Bearer ${token}`,
           },
-        }
+        },
       );
 
       const { url } = presigned;
 
+      // Upload chunk directly to S3 via presigned URL (no backend relay)
       const putRes = await fetch(url, {
         method: "PUT",
         headers: {
@@ -89,23 +92,24 @@ export async function uploadVideoMultipart({
       parts.push({ partNumber, ETag: etag });
     }
 
-    // 3️⃣ COMPLETE MULTIPART
+    // 3. Complete multipart upload — backend tells S3 to assemble parts into final object
     await axios.post(
       `${AWS_API_URL}/${MULTIPART_COMPLETE_URL}`,
-      { key, uploadId, parts },
+      { key, uploadId, parts, channelId },
       {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-      }
+      },
     );
 
+    // Return the S3 object key (path) for the uploaded file
     return key;
   } catch (error) {
     console.error(
       "Multipart Upload Error:",
-      error?.response?.data || error?.message || error
+      error?.response?.data || error?.message || error,
     );
     throw error;
   }

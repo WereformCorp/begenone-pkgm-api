@@ -1,5 +1,6 @@
 import axios from "axios";
 
+/** Converts a timestamp into a human-readable relative string (e.g. "2 hour(s) ago") */
 const calculateTimeAgo = timestamp => {
   const timeDiff = Date.now() - new Date(timestamp).getTime();
   const minutes = Math.floor(timeDiff / 60000);
@@ -34,10 +35,12 @@ export const watchVideo = async ({
   CLOUDFRONTDOMAIN,
 }) => {
   try {
+    // 1. Fetch the primary video by ID from the video service
     const videoRes = await axios.get(
       `${VIDEO_API_URL}${GET_VIDEO_ENDPOINT}${videoId}`,
     );
 
+    // 2. Extract channel ID from video, then fetch channel details (name, logo, etc.)
     const channelId = videoRes.data.data.channel;
     const channelRes = await axios.get(
       `${CHANNEL_API_URL}${GET_CHANNEL_ENDPOINT}${channelId}`,
@@ -45,6 +48,7 @@ export const watchVideo = async ({
 
     const channelData = channelRes.data.data;
 
+    // 3. Fetch all videos for related/recommended content
     const videosRes = await axios.get(
       `${VIDEO_API_URL}${GET_ALL_VIDEOS_ENDPOINT}`,
     );
@@ -52,8 +56,10 @@ export const watchVideo = async ({
     const videoData = videoRes.data.data;
     const videosData = videosRes.data.data;
 
+    // Channel owner's user ID — used later to check subscription status
     const userId = channelData.user;
 
+    // 4. Build thumbnail → CloudFront URL map to avoid repeated URL construction
     const thumbnailMap = new Map(
       videosData.map(item => [
         item.thumbnail,
@@ -61,8 +67,10 @@ export const watchVideo = async ({
       ]),
     );
 
+    // 5. Keep only videos with an associated channel (exclude orphaned entries)
     const filteredVideos = videosData.filter(videoD => videoD.channel);
 
+    // 6. Enrich each video with human-readable time, thumbnail URL, and channel logo URL
     filteredVideos.forEach(videoD => {
       videoD.videoTimeAgo = calculateTimeAgo(videoD.time);
       videoD.thumbnailUrl =
@@ -76,6 +84,7 @@ export const watchVideo = async ({
         : null;
     });
 
+    // 7. Fisher–Yates shuffle for randomized recommendations
     const shuffleArray = array => {
       for (let i = array.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
@@ -84,8 +93,10 @@ export const watchVideo = async ({
     };
 
     shuffleArray(filteredVideos);
+    // 8. Limit recommendations to 6 videos
     const limitedVideos = filteredVideos.slice(0, 6);
 
+    // 9. Determine if current user is subscribed to the channel (requires populated user on video)
     let isUserSubscribed = false;
     const videoUserData = videoData.user;
     if (userId && videoUserData) {
@@ -99,6 +110,7 @@ export const watchVideo = async ({
       ? "sect-mid-vdoP-subsBtn-done"
       : "sect-mid-vdoP-subsBtn";
 
+    // Resolves relative paths to full URLs; returns as-is if already absolute
     const toAbsoluteUrl = (domain, value) => {
       if (!value) return null;
       const str = String(value).trim();
@@ -106,11 +118,12 @@ export const watchVideo = async ({
       return `${domain}/${encodeURIComponent(str)}`;
     };
 
-    // ...
+    // 10. Build full CloudFront URL for the main video asset
     const cloudFrontVideoUrl = toAbsoluteUrl(CLOUDFRONTDOMAIN, videoData.video);
 
     console.log("Constructed CloudFront Video URL:", cloudFrontVideoUrl);
 
+    // 11. Return the full watch payload for the video player UI
     return {
       videoData,
       cloudFrontVideoUrl,

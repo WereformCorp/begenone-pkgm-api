@@ -15,6 +15,7 @@ import axios from "axios";
  * @param {Object} params.dataObj - Fields/operators to update on the video
  * @param {string} params.VIDEO_API_URL - Base URL of the Video service
  * @param {string} params.UPDATE_VIDEO_ENDPOINT - API route prefix
+ * @param {string} [params.token] - Bearer token for authentication
  *
  * @example
  * const result = await updateVideo({
@@ -32,12 +33,20 @@ export const updateVideo = async ({
   dataObj,
   VIDEO_API_URL,
   UPDATE_VIDEO_ENDPOINT,
+  token = null,
 }) => {
   try {
+    console.log("Updating video", videoId, dataObj);
+
+    const headers = {
+      "Content-Type": "application/json",
+      ...(token && { Authorization: `Bearer ${token}` }),
+    };
     const response = await axios.patch(
-      `${VIDEO_API_URL}${UPDATE_VIDEO_ENDPOINT}${videoId}`,
+      `${VIDEO_API_URL}${UPDATE_VIDEO_ENDPOINT}${videoId}/views`,
       dataObj,
       {
+        headers,
         withCredentials: true,
       },
     );
