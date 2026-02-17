@@ -1,0 +1,38 @@
+%% V1.0.13
+%% Upload Multipart
+
+sequenceDiagram
+    autonumber
+    participant App as App/Consumer
+    participant uploadVideo as uploadVideo
+    participant multipart as uploadVideoMultipart
+    participant AWS as AWS API
+    participant S3 as S3
+    participant VideoAPI as Video API
+
+    App->>uploadVideo: uploadVideo(file, thumbnail, title, description, token, ...)
+
+    rect rgb(240, 248, 255)
+        Note over multipart,S3: Video upload (multipart)
+        uploadVideo->>multipart: uploadVideoMultipart(file, filetype: "video")
+        multipart->>AWS: POST init multipart (channelId, filetype, mime)
+        AWS-->>multipart: { uploadId, key }
+        loop For each 10MB chunk
+            multipart->>AWS: GET presigned PUT URL (key, uploadId, partNumber)
+            AWS-->>multipart: { url }
+            multipart->>S3: PUT chunk (presigned URL)
+            S3-->>multipart: ETag
+        end
+        multipart->>AWS: POST complete multipart (key, uploadId, parts)
+        multipart-->>uploadVideo: videoKey
+    end
+
+    opt thumbnail provided
+        uploadVideo->>multipart: uploadVideoMultipart(thumbnail, filetype: "thumbnail")
+        multipart->>AWS: init → parts → complete
+        multipart-->>uploadVideo: thumbnailKey
+    end
+
+    uploadVideo->>VideoAPI: POST create record (title, description, videoKey, thumbnailKey)
+    VideoAPI-->>uploadVideo: video data
+    uploadVideo-->>App: video data    

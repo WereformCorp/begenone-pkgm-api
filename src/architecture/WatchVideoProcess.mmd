@@ -1,0 +1,27 @@
+%% V1.0.13
+%% Watch Video Process
+
+sequenceDiagram
+    autonumber
+    participant App as App/Consumer
+    participant watchVideo as watchVideo
+    participant VideoAPI as Video API
+    participant ChannelAPI as Channel API
+
+    App->>watchVideo: watchVideo(videoId, VIDEO_API_URL, CHANNEL_API_URL, ...)
+
+    watchVideo->>VideoAPI: GET video by ID
+    VideoAPI-->>watchVideo: videoData (includes channel ref)
+
+    watchVideo->>watchVideo: Extract channelId from video
+
+    watchVideo->>ChannelAPI: GET channel by ID
+    ChannelAPI-->>watchVideo: channelData (name, logo, user)
+
+    watchVideo->>VideoAPI: GET all videos (for recommendations)
+    VideoAPI-->>watchVideo: videosData
+
+    watchVideo->>watchVideo: Filter, enrich (timeAgo, thumbnails), shuffle, slice(6)
+    watchVideo->>watchVideo: Check subscription, build shareLink, cloudFrontVideoUrl
+
+    watchVideo-->>App: { videoData, cloudFrontVideoUrl, limitedVideos, channelData, ... }

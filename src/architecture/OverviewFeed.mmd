@@ -1,0 +1,25 @@
+%% V1.0.13
+%% Overview Feed
+
+sequenceDiagram
+    autonumber
+    participant App as App/Consumer
+    participant getOverview as getOverview
+    participant VideoAPI as Video API
+    participant ChannelAPI as Channel API
+
+    App->>getOverview: getOverview(VIDEO_API_URL, CHANNEL_API_URL, ...)
+
+    par Parallel fetch
+        getOverview->>VideoAPI: GET all videos
+        VideoAPI-->>getOverview: videos
+    and
+        getOverview->>ChannelAPI: GET all channels
+        ChannelAPI-->>getOverview: channels
+    end
+
+    getOverview->>getOverview: Build thumbnailMap, channelLogoMap
+    getOverview->>getOverview: Enrich videos (thumbnailUrl, channelLogoUrl, videoTimeAgo)
+    getOverview->>getOverview: Merge featured video, format response
+
+    getOverview-->>App: { data: { videos, featuredVideo } }

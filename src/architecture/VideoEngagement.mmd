@@ -1,0 +1,22 @@
+%% V1.0.13
+%% Video Engagement Flow
+
+sequenceDiagram
+    autonumber
+    participant App as App/Consumer
+    participant engagement as updateVideoInteraction
+    participant VideoAPI as Video API
+
+    App->>engagement: updateVideoInteraction(videoId, action, VIDEO_API_URL, ...)
+    Note right of App: action: "like" | "unlike" | "dislike" | "undislike"
+
+    engagement->>VideoAPI: PATCH /videos/{videoId}/{action}
+    Note right of engagement: withCredentials: true
+
+    alt success
+        VideoAPI-->>engagement: { status: "success", likes, dislikes }
+        engagement-->>App: { likes, dislikes }
+    else error
+        VideoAPI-->>engagement: error
+        engagement-->>App: throw
+    end
