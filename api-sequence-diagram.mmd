@@ -1,0 +1,133 @@
+%% begenone-pkgm-api — Sequence Diagrams
+%% Mermaid.js format (.mmd) — use --- to separate multiple diagrams
+
+%% 1. UPLOAD VIDEO FLOW (uploadVideo → uploadVideoMultipart → S3 → Video API)
+sequenceDiagram
+    autonumber
+    participant App as App/Consumer
+    participant uploadVideo as uploadVideo
+    participant multipart as uploadVideoMultipart
+    participant AWS as AWS API
+    participant S3 as S3
+    participant VideoAPI as Video API
+
+    App->>uploadVideo: uploadVideo(file, thumbnail, title, description, token, ...)
+
+    rect rgb(240, 248, 255)
+        Note over multipart,S3: Video upload (multipart)
+        uploadVideo->>multipart: uploadVideoMultipart(file, filetype: "video")
+        multipart->>AWS: POST init multipart (channelId, filetype, mime)
+        AWS-->>multipart: { uploadId, key }
+        loop For each 10MB chunk
+            multipart->>AWS: GET presigned PUT URL (key, uploadId, partNumber)
+            AWS-->>multipart: { url }
+            multipart->>S3: PUT chunk (presigned URL)
+            S3-->>multipart: ETag
+        end
+        multipart->>AWS: POST complete multipart (key, uploadId, parts)
+        multipart-->>uploadVideo: videoKey
+    end
+
+    opt thumbnail provided
+        uploadVideo->>multipart: uploadVideoMultipart(thumbnail, filetype: "thumbnail")
+        multipart->>AWS: init → parts → complete
+        multipart-->>uploadVideo: thumbnailKey
+    end
+
+    uploadVideo->>VideoAPI: POST create record (title, description, videoKey, thumbnailKey)
+    VideoAPI-->>uploadVideo: video data
+    uploadVideo-->>App: video data
+
+---
+%% 2. WATCH VIDEO FLOW (watchVideo — Video API → Channel API → Video API)
+sequenceDiagram
+    autonumber
+    participant App as App/Consumer
+    participant watchVideo as watchVideo
+    participant VideoAPI as Video API
+    participant ChannelAPI as Channel API
+
+    App->>watchVideo: watchVideo(videoId, VIDEO_API_URL, CHANNEL_API_URL, ...)
+
+    watchVideo->>VideoAPI: GET video by ID
+    VideoAPI-->>watchVideo: videoData (includes channel ref)
+
+    watchVideo->>watchVideo: Extract channelId from video
+
+    watchVideo->>ChannelAPI: GET channel by ID
+    ChannelAPI-->>watchVideo: channelData (name, logo, user)
+
+    watchVideo->>VideoAPI: GET all videos (for recommendations)
+    VideoAPI-->>watchVideo: videosData
+
+    watchVideo->>watchVideo: Filter, enrich (timeAgo, thumbnails), shuffle, slice(6)
+    watchVideo->>watchVideo: Check subscription, build shareLink, cloudFrontVideoUrl
+
+    watchVideo-->>App: { videoData, cloudFrontVideoUrl, limitedVideos, channelData, ... }
+
+---
+%% 3. OVERVIEW / HOME FEED FLOW (getOverview — parallel Video + Channel fetch)
+sequenceDiagram
+    autonumber
+    participant App as App/Consumer
+    participant getOverview as getOverview
+    participant VideoAPI as Video API
+    participant ChannelAPI as Channel API
+
+    App->>getOverview: getOverview(VIDEO_API_URL, CHANNEL_API_URL, ...)
+
+    par Parallel fetch
+        getOverview->>VideoAPI: GET all videos
+        VideoAPI-->>getOverview: videos
+    and
+        getOverview->>ChannelAPI: GET all channels
+        ChannelAPI-->>getOverview: channels
+    end
+
+    getOverview->>getOverview: Build thumbnailMap, channelLogoMap
+    getOverview->>getOverview: Enrich videos (thumbnailUrl, channelLogoUrl, videoTimeAgo)
+    getOverview->>getOverview: Merge featured video, format response
+
+    getOverview-->>App: { data: { videos, featuredVideo } }
+
+---
+%% 4. AUTH FLOW (login with rate limiting)
+sequenceDiagram
+    autonumber
+    participant App as App/Consumer
+    participant login as login
+    participant Limiter as Bottleneck
+    participant AuthAPI as Auth API
+
+    App->>login: login(email, password, AUTH_API_URL, LOGIN_ENDPOINT)
+
+    login->>Limiter: schedule(request)
+    Limiter->>login: (when allowed, minTime: 200ms, maxConcurrent: 1)
+
+    login->>AuthAPI: POST login { eAddress: { email, password } }
+    Note right of login: withCredentials: true
+    AuthAPI-->>login: { user, token, ... }
+
+    login-->>App: response.data
+
+---
+%% 5. VIDEO ENGAGEMENT FLOW (like/dislike/comment/share)
+sequenceDiagram
+    autonumber
+    participant App as App/Consumer
+    participant engagement as updateVideoInteraction
+    participant VideoAPI as Video API
+
+    App->>engagement: updateVideoInteraction(videoId, action, VIDEO_API_URL, ...)
+    Note right of App: action: "like" | "unlike" | "dislike" | "undislike"
+
+    engagement->>VideoAPI: PATCH /videos/{videoId}/{action}
+    Note right of engagement: withCredentials: true
+
+    alt success
+        VideoAPI-->>engagement: { status: "success", likes, dislikes }
+        engagement-->>App: { likes, dislikes }
+    else error
+        VideoAPI-->>engagement: error
+        engagement-->>App: throw
+    end
