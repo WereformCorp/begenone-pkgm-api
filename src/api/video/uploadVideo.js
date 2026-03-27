@@ -37,7 +37,7 @@ export async function uploadVideo({
 
   try {
     // 1️⃣ Upload video to S3 (multipart)
-    const videoKey = await uploadVideoMultipart({
+    const videoUpload = await uploadVideoMultipart({
       file,
       channelId,
       AWS_API_URL,
@@ -47,22 +47,25 @@ export async function uploadVideo({
       MULTIPART_PART_URL,
       MULTIPART_COMPLETE_URL,
     });
+    const { key: videoKey, videoId } = videoUpload;
 
     console.log("Video Key from Upload:", videoKey);
 
     // 2️⃣ Upload thumbnail if present
     let thumbnailKey = null;
     if (thumbnail) {
-      thumbnailKey = await uploadVideoMultipart({
+      const thumbnailUpload = await uploadVideoMultipart({
         file: thumbnail,
         channelId,
         AWS_API_URL,
         token,
         filetype: "thumbnail",
+        videoId,
         AWS_INIT_ENDPOINT,
         MULTIPART_PART_URL,
         MULTIPART_COMPLETE_URL,
       });
+      thumbnailKey = thumbnailUpload.key;
 
       console.log("Thumbnail Key from Upload:", thumbnailKey);
     }

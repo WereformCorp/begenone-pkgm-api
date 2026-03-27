@@ -21,6 +21,7 @@ export async function uploadVideoMultipart({
   AWS_API_URL,
   token,
   filetype,
+  videoId,
   AWS_INIT_ENDPOINT,
   MULTIPART_PART_URL,
   MULTIPART_COMPLETE_URL,
@@ -44,6 +45,7 @@ export async function uploadVideoMultipart({
         channelId,
         filetype,
         mimeType: mime,
+        videoId,
       },
       {
         headers: {
@@ -53,7 +55,7 @@ export async function uploadVideoMultipart({
       },
     );
 
-    const { uploadId, key } = initData;
+    const { uploadId, key, videoId: resolvedVideoId } = initData;
     const parts = [];
 
     // 2. Upload each chunk: get presigned URL → PUT to S3 → collect ETag for completion
@@ -88,7 +90,15 @@ export async function uploadVideoMultipart({
         throw new Error(`S3 PUT failed for part ${partNumber}`);
       }
 
-      const etag = putRes.headers.get("ETag");
+      const etag =
+        putRes.headers.get("ETag") ||
+        putRes.headers.get("etag") ||
+        putRes.headers.get("Etag");
+      if (!etag) {
+        throw new Error(
+          `Missing ETag from S3 for part ${partNumber}. Check bucket CORS ExposeHeaders includes ETag.`,
+        );
+      }
       parts.push({ partNumber, ETag: etag });
     }
 
@@ -105,7 +115,7 @@ export async function uploadVideoMultipart({
     );
 
     // Return the S3 object key (path) for the uploaded file
-    return key;
+    return { key, videoId: resolvedVideoId };
   } catch (error) {
     console.error(
       "Multipart Upload Error:",
