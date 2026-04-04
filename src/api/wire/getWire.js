@@ -26,7 +26,9 @@ export const getWire = async ({ id, WIRE_API_URL, GETWIRE_ENDPOINT_URL }) => {
 
     console.log("Get Wire API response:", response.data);
 
-    if (response.data.status !== "success") {
+    const ok =
+      String(response.data?.status ?? "").toLowerCase() === "success";
+    if (!ok) {
       throw new Error("Failed to fetch wire.");
     }
 
