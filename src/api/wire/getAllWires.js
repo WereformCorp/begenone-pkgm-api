@@ -20,6 +20,7 @@ const cloudFrontDomain = "https://dpz1evfcdl4g3.cloudfront.net";
  *
  * @param {number} [params.page=1] - Page number
  * @param {number} [params.limit=10] - Items per page
+ * @param {string} [params.channel] - Optional channel id (Mongo) — same as wire service `?channel=`
  *
  * @returns {Promise<Object>} Wires list, pagination meta, and channel logos
  */
@@ -28,6 +29,7 @@ export const getAllWires = async ({
   CHANNEL_API_URL,
   page = 1,
   limit = 10,
+  channel,
   GET_ALL_WIRES_ENDPOINT_URL,
   CHANNEL_API_ENDPOINT,
 }) => {
@@ -36,11 +38,16 @@ export const getAllWires = async ({
     console.info("WIRE_API_URL:", WIRE_API_URL);
     console.info("CHANNEL_API_URL:", CHANNEL_API_URL);
 
+    const params = { page, limit };
+    if (channel != null && String(channel).trim() !== "") {
+      params.channel = String(channel);
+    }
+
     // Fetch paginated wires
     const wiresRes = await axios.get(
       `${WIRE_API_URL}/${GET_ALL_WIRES_ENDPOINT_URL}`,
       {
-        params: { page, limit },
+        params,
       },
     );
 
@@ -48,21 +55,31 @@ export const getAllWires = async ({
 
     console.info("GetAllWires | Wires response:", wiresRes);
 
-    // Fetch channels for logo mapping
-    const channelsRes = await axios.get(
-      `${CHANNEL_API_URL}${CHANNEL_API_ENDPOINT}`,
-    );
+    let channelLogos = {};
 
-    const channels = channelsRes.data.data;
+    // Listing all channels is heavy; skip when filtering by one channel (e.g. channel page tab).
+    if (
+      !params.channel &&
+      CHANNEL_API_URL &&
+      CHANNEL_API_ENDPOINT
+    ) {
+      const channelsRes = await axios.get(
+        `${CHANNEL_API_URL}${CHANNEL_API_ENDPOINT}`,
+      );
 
-    const channelLogoMap = new Map(
-      channels.map(channel => [
-        channel._id,
-        channel.channelLogo
-          ? `${cloudFrontDomain}/${channel.channelLogo}`
-          : null,
-      ]),
-    );
+      const channels = channelsRes.data.data;
+
+      const channelLogoMap = new Map(
+        channels.map(ch => [
+          ch._id,
+          ch.channelLogo
+            ? `${cloudFrontDomain}/${ch.channelLogo}`
+            : null,
+        ]),
+      );
+
+      channelLogos = Object.fromEntries(channelLogoMap);
+    }
 
     // Backend returns wires under wiresRes.data.data
     const rawWires = wiresRes.data.data;
@@ -76,7 +93,7 @@ export const getAllWires = async ({
     return {
       data: wires,
       meta: wiresRes.data.meta,
-      channelLogos: Object.fromEntries(channelLogoMap),
+      channelLogos,
     };
   } catch (error) {
     console.error("Error in getAllWires:", error);
