@@ -22,8 +22,11 @@ import axios from "axios";
  * @param {string} UPDATE_VIDEO_INTERACTION_ENDPOINT
  * API route prefix for interaction updates.
  *
- * @returns {Promise<{likes: number, dislikes: number}>}
- * Updated engagement counts returned by the backend.
+ * @param {string|null} [params.token]
+ * Bearer JWT — required on mobile (React Native has no session cookies).
+ *
+ * @returns {Promise<{likes: number, dislikes: number, userLiked?: boolean, userDisliked?: boolean}>}
+ * Updated engagement counts and user flags from the backend.
  *
  * @throws {Error}
  * Throws if the network request fails or the server responds with an error.
@@ -44,12 +47,19 @@ export const updateVideoInteraction = async ({
   action,
   VIDEO_API_URL,
   UPDATE_VIDEO_INTERACTION_ENDPOINT,
+  token = null,
 }) => {
   try {
+    const headers = {
+      "Content-Type": "application/json",
+      ...(token && { Authorization: `Bearer ${token}` }),
+    };
+
     const response = await axios.patch(
       `${VIDEO_API_URL}${UPDATE_VIDEO_INTERACTION_ENDPOINT}${videoId}/${action}`,
       {},
       {
+        headers,
         withCredentials: true,
       },
     );
@@ -61,6 +71,8 @@ export const updateVideoInteraction = async ({
       return {
         likes: response.data.likes,
         dislikes: response.data.dislikes,
+        userLiked: response.data.userLiked,
+        userDisliked: response.data.userDisliked,
       };
     } else {
       throw new Error("Failed to update video interaction");
